@@ -1,3 +1,3 @@
-INSERT INTO users (name, password, phone_number, surname)
+INSERT INTO users (id, email, enabled, name, surname, last_password_reset_date, password, phone_number, username, role)
 VALUES
-    ('Nina', '$2a$10$2iKltlyS7qxZPpFEub2U5OsjaPHTLhLYiB8OqLoK5X4mSNPr.emwS', '0628817058', 'Bu'); -- password = user
+    (-1, 'peraperic@gmail.com', true, 'Pera', 'Peric', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245234', 'peraperic', 'ADMINISTRATOR');
