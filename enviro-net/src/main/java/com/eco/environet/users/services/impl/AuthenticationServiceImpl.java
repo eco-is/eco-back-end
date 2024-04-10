@@ -57,6 +57,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(role)
                 .enabled(true)
                 .lastPasswordResetDate(null)
+                .active(true)
                 .build();
 
 
