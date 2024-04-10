@@ -72,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         validateMember(request);
 
         var user = User.builder()
-                .username("")
+                .username(request.getEmail())
                 .password("")
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -81,6 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.values()[request.getRole()])
                 .enabled(false)
                 .lastPasswordResetDate(null)
+                .active(true)
                 .build();
 
         repository.save(user);
@@ -116,6 +117,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    // TODO validate member
+//    public Optional<UserDto> activateUserAccount(Long id) {
+//        try {
+//            var user = repository.findById(id).orElseThrow();
+//            if (user.getRole() != Role.USER) throw new Exception();
+//            user.setEnabled(true);
+//            repository.save(user);
+//            return Optional.ofNullable(mapper.map(user, UserDto.class));
+//        } catch (Exception e) {
+//            return Optional.empty();
+//        }
+//    }
+
     private void validateMember(RegisterRequest request) {
         Role role = Role.values()[request.getRole()];
         if (!role.isOrganizationMember()) {
@@ -141,5 +155,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         emailSender.sendEmail(user.getEmail(), "Finalize Registration", emailBody);
     }
-
 }

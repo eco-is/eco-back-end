@@ -46,7 +46,7 @@ public class User implements UserDetails {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "last_password_reset_date", nullable = true)
+    @Column(name = "last_password_reset_date")
     private Timestamp lastPasswordResetDate;
 
     @Enumerated(EnumType.STRING)
@@ -56,7 +56,10 @@ public class User implements UserDetails {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
-    public User(Long id, String name, String surname, String email, String username, String password, String phoneNumber, Timestamp lastPasswordResetDate, Role role, boolean enabled) {
+    @Column(name = "active")
+    private boolean active;
+
+    public User(Long id, String name, String surname, String email, String username, String password, String phoneNumber, Timestamp lastPasswordResetDate, Role role, boolean enabled, boolean active) {
         validateEmail(email);
 
         this.id = id;
@@ -69,12 +72,7 @@ public class User implements UserDetails {
         this.lastPasswordResetDate = lastPasswordResetDate;
         this.role = role;
         this.enabled = enabled;
-    }
-
-    private void validateEmail(String email) {
-        if (email == null || !email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            throw new IllegalArgumentException("Invalid email address");
-        }
+        this.active = active;
     }
 
     @Override
@@ -101,5 +99,23 @@ public class User implements UserDetails {
         Timestamp now = new Timestamp(new Date().getTime());
         this.setLastPasswordResetDate(now);
         this.password = password;
+    }
+
+    public void deactivate() {
+        this.active = false;
+        this.enabled = false;
+    }
+
+    public String getMembershipStatus() {
+        if(this.active && this.enabled) return "Verified";
+        if(this.active) return "Pending";
+        if(!this.enabled) return "Inactive";
+        throw new IllegalStateException("Invalid membership status");
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || !email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
     }
 }

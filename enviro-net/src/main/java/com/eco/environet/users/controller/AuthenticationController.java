@@ -62,7 +62,7 @@ public class AuthenticationController {
                             schema = @Schema(implementation = AuthenticationResponse.class)) }),
             @ApiResponse(responseCode = "409", description = "Email already exist",
                     content = @Content) })
-    @PostMapping(value="/register/member", consumes="application/json")
+    @PostMapping(value="/register/members", consumes="application/json")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
     public ResponseEntity<Void> registerOrganizationMember(
             @RequestBody RegisterRequest request
