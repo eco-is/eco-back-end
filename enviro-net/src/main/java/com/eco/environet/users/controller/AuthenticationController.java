@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +36,7 @@ public class AuthenticationController {
             @RequestBody RegisterRequest request
     ) {
         var result = service.register(request);
-        return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().build());
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @Operation(summary = "Authenticate user by username and password")
@@ -50,7 +51,7 @@ public class AuthenticationController {
             @RequestBody AuthenticationRequest request
     ) {
         var result = service.authenticate(request);
-        return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok(result);
     }
 
     // primer zasticene metode

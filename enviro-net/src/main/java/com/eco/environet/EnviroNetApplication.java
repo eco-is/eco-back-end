@@ -19,7 +19,6 @@ public class EnviroNetApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EnviroNetApplication.class, args);
-//		System.out.println("Hello world!");
 	}
 
 	@EventListener({ApplicationReadyEvent.class})
