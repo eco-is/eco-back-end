@@ -1,7 +1,7 @@
 package com.eco.environet.users.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,6 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="users")
@@ -35,7 +34,7 @@ public class User implements UserDetails {
     private String surname;
 
     @Column(name = "email", nullable = false, unique = true)
-    //@Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+    @Email(message = "Invalid email address")
     private String email;
 
     @Column(name = "username", nullable = false, unique = true)
@@ -56,6 +55,27 @@ public class User implements UserDetails {
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
+
+    public User(Long id, String name, String surname, String email, String username, String password, String phoneNumber, Timestamp lastPasswordResetDate, Role role, boolean enabled) {
+        validateEmail(email);
+
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.lastPasswordResetDate = lastPasswordResetDate;
+        this.role = role;
+        this.enabled = enabled;
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || !email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

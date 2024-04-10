@@ -7,5 +7,15 @@ public enum Role {
     BOARD_MEMBER,
     PROJECT_MANAGER,
     PROJECT_COORDINATOR,
-    EDUCATOR
+    EDUCATOR;
+
+    public boolean isOrganizationMember() {
+        Role[] organizationRoles = {ACCOUNTANT, BOARD_MEMBER, PROJECT_MANAGER, PROJECT_COORDINATOR, EDUCATOR};
+        for (Role role : organizationRoles) {
+            if (this == role) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

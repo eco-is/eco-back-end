@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +27,16 @@ public class AuthenticationController {
 
     @Operation(summary = "Register new user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Registered",
+            @ApiResponse(responseCode = "201", description = "Registered",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = AuthenticationResponse.class)) }),
             @ApiResponse(responseCode = "400", description = "Email or username already exist",
                     content = @Content) })
     @PostMapping(value="/register", consumes="application/json")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<AuthenticationResponse> registerUser(
             @RequestBody RegisterRequest request
     ) {
-        var result = service.register(request);
+        var result = service.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
@@ -54,12 +55,19 @@ public class AuthenticationController {
         return ResponseEntity.ok(result);
     }
 
-    // primer zasticene metode
-    // ukoliko zelite da napravite metodu kojoj moze da pristupi vise razlicitih uloga mozete napisati sledece:
-    //@PreAuthorize("hasAnyRole('ADMINISTRATOR', 'REGISTERED_USER')")
-    @GetMapping(value = "/helloworld")
+    @Operation(summary = "Register new organization member")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Registered",
+                    content = { @Content(mediaType = "text/plain; charset=utf-8",
+                            schema = @Schema(implementation = AuthenticationResponse.class)) }),
+            @ApiResponse(responseCode = "409", description = "Email already exist",
+                    content = @Content) })
+    @PostMapping(value="/register/member", consumes="application/json")
     @PreAuthorize("hasRole('ADMINISTRATOR')")
-    public String helloWorld() {
-        return "Hello world";
+    public ResponseEntity<Void> registerOrganizationMember(
+            @RequestBody RegisterRequest request
+    ) {
+        service.registerOrganizationMember(request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
