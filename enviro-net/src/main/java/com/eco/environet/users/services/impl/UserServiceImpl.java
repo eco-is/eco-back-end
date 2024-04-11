@@ -6,6 +6,7 @@ import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.users.repository.UserSpecifications;
 import com.eco.environet.users.services.UserService;
+import com.eco.environet.util.EnumMapper;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,12 @@ public class UserServiceImpl implements UserService {
                 .and(UserSpecifications.rolesIn(organizationRoles));
 
         Page<User> members = userRepository.findAll(spec,  pageable);
-        return mapper.mapPage(members, UserDto.class, "password");
+        Page<UserDto> memberDtos = mapper.mapPage(members, UserDto.class, "password");
+        for (UserDto dto : memberDtos) {
+            dto.setRole(EnumMapper.convertToTitleCase(dto.getRole()));
+        }
+
+        return memberDtos;
     }
 
     @Override
