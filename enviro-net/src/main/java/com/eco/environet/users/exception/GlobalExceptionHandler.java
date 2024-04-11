@@ -1,7 +1,6 @@
 package com.eco.environet.users.exception;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -23,8 +22,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleIncorrectPasswordException() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password or account not activated.");
+    public ResponseEntity<String> handleAuthExceptions(Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)

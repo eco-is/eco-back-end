@@ -2,6 +2,7 @@ package com.eco.environet.users.controller;
 
 import com.eco.environet.users.dto.AuthenticationRequest;
 import com.eco.environet.users.dto.AuthenticationResponse;
+import com.eco.environet.users.dto.VerifyMemberRequest;
 import com.eco.environet.users.dto.RegisterRequest;
 import com.eco.environet.users.services.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,5 +70,19 @@ public class AuthenticationController {
     ) {
         service.registerOrganizationMember(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "Finalize organization member registration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Member registration finalized"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping(value="/finalize-registration", consumes="application/json")
+    public ResponseEntity<Void> finalizeRegistration(
+            @Valid @RequestBody VerifyMemberRequest request
+    ) {
+        service.verifyOrganizationMember(request);
+        return ResponseEntity.ok().build();
     }
 }

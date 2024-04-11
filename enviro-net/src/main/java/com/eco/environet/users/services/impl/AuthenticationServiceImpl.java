@@ -2,6 +2,7 @@ package com.eco.environet.users.services.impl;
 
 import com.eco.environet.users.dto.AuthenticationRequest;
 import com.eco.environet.users.dto.AuthenticationResponse;
+import com.eco.environet.users.dto.VerifyMemberRequest;
 import com.eco.environet.users.dto.RegisterRequest;
 import com.eco.environet.users.exception.CredentialsTakenException;
 import com.eco.environet.users.model.Role;
@@ -13,7 +14,10 @@ import com.eco.environet.util.EmailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
     private final EmailSender emailSender;
 
@@ -118,18 +123,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    // TODO validate member
-//    public Optional<UserDto> activateUserAccount(Long id) {
-//        try {
-//            var user = repository.findById(id).orElseThrow();
-//            if (user.getRole() != Role.USER) throw new Exception();
-//            user.setEnabled(true);
-//            repository.save(user);
-//            return Optional.ofNullable(mapper.map(user, UserDto.class));
-//        } catch (Exception e) {
-//            return Optional.empty();
-//        }
-//    }
+    public void verifyOrganizationMember(VerifyMemberRequest request) {
+        String email = validateToken(request);
+
+        User user = repository.findByUsername(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if(user.isEnabled()){
+            throw new IllegalStateException("Account is already verified");
+        }
+
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEnabled(true);
+
+        repository.save(user);
+    }
+
+    private String validateToken(VerifyMemberRequest request) {
+        String token = request.getToken();
+        String email = request.getEmail();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        if (!jwtService.isTokenValid(token, userDetails)) {
+            throw new BadCredentialsException("Invalid or expired token");
+        }
+        return email;
+    }
 
     private void validateMember(RegisterRequest request) {
         Role role = Role.values()[request.getRole()];
