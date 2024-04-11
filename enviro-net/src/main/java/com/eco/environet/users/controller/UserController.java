@@ -50,13 +50,16 @@ public class UserController {
     public ResponseEntity<Page<UserDto>> getAllOrganizationMembers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "surname", required = false) String surname,
+            @RequestParam(name = "email", required = false) String email,
             @RequestParam(name = "sort", required = false, defaultValue = "surname") String sortField,
             @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAllOrganizationMembers(pageRequest);
+        var result = service.findAllOrganizationMembers(name, surname, email, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

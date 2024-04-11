@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
 
-    Page<UserDto> findAllOrganizationMembers(Pageable pageable);
+    Page<UserDto> findAllOrganizationMembers(String name, String surname, String email, Pageable pageable);
     void removeOrganizationMember(Long memberId);
 }

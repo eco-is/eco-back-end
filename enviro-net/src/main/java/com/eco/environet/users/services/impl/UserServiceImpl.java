@@ -4,12 +4,15 @@ import com.eco.environet.users.dto.UserDto;
 import com.eco.environet.users.model.Role;
 import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
+import com.eco.environet.users.repository.UserSpecifications;
 import com.eco.environet.users.services.UserService;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,9 +25,15 @@ public class UserServiceImpl implements UserService {
     private final Mapper mapper;
 
     @Override
-    public Page<UserDto> findAllOrganizationMembers(Pageable pageable) {
+    public Page<UserDto> findAllOrganizationMembers(String name, String surname, String email, Pageable pageable) {
         List<Role> organizationRoles = Role.getAllOrganizationRoles();
-        Page<User> members = userRepository.findAllByRoles(organizationRoles, pageable);
+
+        Specification<User> spec = Specification.where(StringUtils.isBlank(name) ? null : UserSpecifications.nameLike(name))
+                .and(StringUtils.isBlank(surname) ? null : UserSpecifications.surnameLike(surname))
+                .and(StringUtils.isBlank(email) ? null : UserSpecifications.emailLike(email))
+                .and(UserSpecifications.rolesIn(organizationRoles));
+
+        Page<User> members = userRepository.findAll(spec,  pageable);
         return mapper.mapPage(members, UserDto.class, "password");
     }
 

@@ -56,7 +56,7 @@ public class User implements UserDetails {
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 
-    @Column(name = "active")
+    @Column(name = "active", nullable = false)
     private boolean active;
 
     public User(Long id, String name, String surname, String email, String username, String password, String phoneNumber, Timestamp lastPasswordResetDate, Role role, boolean enabled, boolean active) {
