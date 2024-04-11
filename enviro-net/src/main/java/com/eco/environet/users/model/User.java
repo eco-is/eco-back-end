@@ -9,7 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -44,8 +46,18 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = true)
     private String phoneNumber;
+
+    @Column(name = "date_of_birth", nullable = true)
+    private Timestamp dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender", nullable = true)
+    private Gender gender;
+
+    @Column(name = "points")
+    private int points;
 
     @Column(name = "last_password_reset_date", nullable = true)
     private Timestamp lastPasswordResetDate;
