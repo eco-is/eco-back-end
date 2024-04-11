@@ -5,6 +5,7 @@ import com.eco.environet.users.dto.AuthenticationResponse;
 import com.eco.environet.users.dto.RegisterRequest;
 import com.eco.environet.users.exception.EmailExistsException;
 import com.eco.environet.users.exception.IncorrectPasswordException;
+import com.eco.environet.users.model.Gender;
 import com.eco.environet.users.model.Role;
 import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
@@ -33,7 +34,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userExistsByEmail || userExistsByUsername) {
             throw new EmailExistsException("User with the provided email or username already exists");
         }
-
         var user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -44,8 +44,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(Role.values()[request.getRole()])
                 .enabled(true)
                 .lastPasswordResetDate(null)
+                .dateOfBirth(request.getDateOfBirth())
+                .gender(request.getGender() == null ? null : Gender.values()[request.getGender()])
+                .points(request.getPoints())
                 .build();
-
         repository.save(user);
 
         var jwtToken = jwtService.generateToken(user);
@@ -53,6 +55,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .token(jwtToken)
                 .build();
     }
+
 
     public AuthenticationResponse changePassword(AuthenticationRequest request) {
         var user = repository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
