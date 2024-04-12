@@ -142,7 +142,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private String validateToken(VerifyMemberRequest request) {
         String token = request.getToken();
-        String email = request.getEmail();
+        String email = jwtService.extractUsername(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         if (!jwtService.isTokenValid(token, userDetails)) {
             throw new BadCredentialsException("Invalid or expired token");

@@ -78,7 +78,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "400", description = "Invalid request body"),
             @ApiResponse(responseCode = "401", description = "Unauthorized")
     })
-    @PostMapping(value="/finalize-registration", consumes="application/json")
+    @PostMapping(value="/verify/members", consumes="application/json")
     public ResponseEntity<Void> finalizeRegistration(
             @Valid @RequestBody VerifyMemberRequest request
     ) {

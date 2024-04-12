@@ -10,9 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VerifyMemberRequest {
+
     private String token;
-    private String email;
     private String username;
     private String password;
-
 }
