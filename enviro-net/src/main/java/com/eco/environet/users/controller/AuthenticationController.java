@@ -80,7 +80,7 @@ public class AuthenticationController {
     })
     @PostMapping(value="/verify/members", consumes="application/json")
     public ResponseEntity<Void> finalizeRegistration(
-            @Valid @RequestBody VerifyMemberRequest request
+            @RequestBody VerifyMemberRequest request
     ) {
         service.verifyOrganizationMember(request);
         return ResponseEntity.ok().build();

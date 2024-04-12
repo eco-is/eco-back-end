@@ -53,9 +53,6 @@ public class User implements UserDetails {
     @Column(name = "gender")
     private Gender gender;
 
-    @Column(name = "points")
-    private int points;
-
     @Column(name = "last_password_reset_date")
     private Timestamp lastPasswordResetDate;
 
@@ -70,7 +67,7 @@ public class User implements UserDetails {
     private boolean active;
 
     public User(Long id, String name, String surname, String email, String username, String password, String phoneNumber,
-                Timestamp dateOfBirth, Gender gender, int points, Timestamp lastPasswordResetDate, Role role, boolean enabled, boolean active) {
+                Timestamp dateOfBirth, Gender gender, Timestamp lastPasswordResetDate, Role role, boolean enabled, boolean active) {
         validateEmail(email);
 
         this.id = id;
@@ -85,7 +82,7 @@ public class User implements UserDetails {
         this.enabled = enabled;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
-        this.points = points;
+        this.active = active;
     }
 
     @Override

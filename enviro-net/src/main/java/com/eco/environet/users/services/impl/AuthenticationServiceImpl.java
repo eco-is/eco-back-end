@@ -65,7 +65,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastPasswordResetDate(null)
                 .dateOfBirth(request.getDateOfBirth())
                 .gender(request.getGender() == null ? null : Gender.values()[request.getGender()])
-                .points(request.getPoints())
                 .active(true)
                 .build();
 
