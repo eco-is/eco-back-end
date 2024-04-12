@@ -7,16 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserDto {
-    private Long id;
-    private String name;
-    private String surname;
+@NoArgsConstructor
+public class VerifyMemberRequest {
+
+    private String token;
     private String username;
-    private String email;
     private String password;
-    private String phoneNumber;
-    private String role;
-    private String membershipStatus;
 }

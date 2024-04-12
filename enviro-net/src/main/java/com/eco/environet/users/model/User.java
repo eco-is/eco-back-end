@@ -1,7 +1,7 @@
 package com.eco.environet.users.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.List;
 @Data
 @Entity
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="users")
@@ -37,7 +34,7 @@ public class User implements UserDetails {
     private String surname;
 
     @Column(name = "email", nullable = false, unique = true)
-    //@Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")
+    @Email(message = "Invalid email address")
     private String email;
 
     @Column(name = "username", nullable = false, unique = true)
@@ -46,20 +43,20 @@ public class User implements UserDetails {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "phone_number", nullable = true)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "date_of_birth", nullable = true)
+    @Column(name = "date_of_birth")
     private Timestamp dateOfBirth;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", nullable = true)
+    @Column(name = "gender")
     private Gender gender;
 
     @Column(name = "points")
     private int points;
 
-    @Column(name = "last_password_reset_date", nullable = true)
+    @Column(name = "last_password_reset_date")
     private Timestamp lastPasswordResetDate;
 
     @Enumerated(EnumType.STRING)
@@ -68,6 +65,28 @@ public class User implements UserDetails {
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
+
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
+    public User(Long id, String name, String surname, String email, String username, String password, String phoneNumber,
+                Timestamp dateOfBirth, Gender gender, int points, Timestamp lastPasswordResetDate, Role role, boolean enabled, boolean active) {
+        validateEmail(email);
+
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.lastPasswordResetDate = lastPasswordResetDate;
+        this.role = role;
+        this.enabled = enabled;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.points = points;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -93,5 +112,23 @@ public class User implements UserDetails {
         Timestamp now = new Timestamp(new Date().getTime());
         this.setLastPasswordResetDate(now);
         this.password = password;
+    }
+
+    public void deactivate() {
+        this.active = false;
+        this.enabled = false;
+    }
+
+    public String getMembershipStatus() {
+        if(this.active && this.enabled) return "Verified";
+        if(this.active) return "Pending";
+        if(!this.enabled) return "Inactive";
+        throw new IllegalStateException("Invalid membership status");
+    }
+
+    private void validateEmail(String email) {
+        if (email == null || !email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Invalid email address");
+        }
     }
 }
