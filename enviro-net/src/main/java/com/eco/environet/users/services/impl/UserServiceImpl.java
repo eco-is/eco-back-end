@@ -1,6 +1,7 @@
 package com.eco.environet.users.services.impl;
 
 import com.eco.environet.users.dto.UserDto;
+import com.eco.environet.users.dto.UserInfoDto;
 import com.eco.environet.users.model.Role;
 import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
@@ -24,6 +25,33 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final Mapper mapper;
+
+    @Override
+    public UserInfoDto findUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
+        UserInfoDto userDto = mapper.map(user, UserInfoDto.class, "password");
+        return userDto;
+    }
+
+    @Override
+    public UserInfoDto updateUser(UserInfoDto userInfoDto) {
+        User user = userRepository.findById(userInfoDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userInfoDto.getId()));
+
+        // Update the user information with data from userInfoDto
+        user.setName(userInfoDto.getName());
+        user.setSurname(userInfoDto.getSurname());
+        user.setDateOfBirth(userInfoDto.getDateOfBirth());
+        user.setGender(userInfoDto.getGender());
+        user.setPhoneNumber(userInfoDto.getPhoneNumber());
+
+        // TODO - email, password and username update implementation
+
+        userRepository.save(user);
+        UserInfoDto updatedUserInfoDto = mapper.map(user, UserInfoDto.class, "password");
+        return updatedUserInfoDto;
+    }
 
     @Override
     public Page<UserDto> findAllOrganizationMembers(String name, String surname, String email, Pageable pageable) {
