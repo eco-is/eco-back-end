@@ -89,6 +89,32 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
+    @Operation(summary = "Update user email by clicking on confirmation link")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all organization members",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserInfoDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content)})
+    @PutMapping(value="/update-email/{email}")
+    public ResponseEntity<UserInfoDto> updateEmail(@PathVariable String email, @RequestParam("token") String token) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        var result = service.updateUserEmail(currentUsername, email, token);
+
+        // Check if the authenticated user matches the requested user
+        if (!result.getUsername().equals(currentUsername)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if (result != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @Operation(summary = "Get all organization members")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fetched all organization members",

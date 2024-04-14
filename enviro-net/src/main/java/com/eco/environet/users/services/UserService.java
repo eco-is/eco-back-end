@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 public interface UserService {
     UserInfoDto findUser(Long id);
     UserInfoDto updateUser(UserInfoDto userInfoDto);
+    UserInfoDto updateUserEmail(String currentUsername, String email, String token);
     Page<UserDto> findAllOrganizationMembers(String name, String surname, String email, Pageable pageable);
     void removeOrganizationMember(Long memberId);
 }
