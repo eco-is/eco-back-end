@@ -56,8 +56,6 @@ public class UserServiceImpl implements UserService {
         user.setDateOfBirth(userInfoDto.getDateOfBirth());
         user.setGender(userInfoDto.getGender());
         user.setPhoneNumber(userInfoDto.getPhoneNumber());
-
-        // TODO - password and username update implementation
         if (!userInfoDto.getEmail().equals(user.getEmail())){
             updateEmail(user, userInfoDto.getEmail());
         }
