@@ -1,9 +1,6 @@
 package com.eco.environet.users.controller;
 
-import com.eco.environet.users.dto.AuthenticationRequest;
-import com.eco.environet.users.dto.AuthenticationResponse;
-import com.eco.environet.users.dto.VerifyMemberRequest;
-import com.eco.environet.users.dto.RegisterRequest;
+import com.eco.environet.users.dto.*;
 import com.eco.environet.users.services.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -84,5 +81,29 @@ public class AuthenticationController {
     ) {
         service.verifyOrganizationMember(request);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Check if the provided old password is valid")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Old password is valid"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PostMapping(value="/check-old-password", consumes="application/json")
+    public ResponseEntity<Boolean> checkOldPasswordMatch(@RequestBody AuthenticationRequest request) {
+        boolean isValid = service.checkOldPasswordMatch(request);
+        return ResponseEntity.ok().body(isValid);
+    }
+
+    @Operation(summary = "Change password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password changed"),
+            @ApiResponse(responseCode = "400", description = "Invalid request body"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    @PutMapping(value="/change-password")
+    public ResponseEntity<AuthenticationResponse> changePassword(@Valid @RequestBody AuthenticationRequest request) {
+        AuthenticationResponse response = service.changePassword(request);
+        return ResponseEntity.ok(response);
     }
 }

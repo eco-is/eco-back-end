@@ -1,9 +1,6 @@
 package com.eco.environet.users.services.impl;
 
-import com.eco.environet.users.dto.AuthenticationRequest;
-import com.eco.environet.users.dto.AuthenticationResponse;
-import com.eco.environet.users.dto.RegisterRequest;
-import com.eco.environet.users.dto.VerifyMemberRequest;
+import com.eco.environet.users.dto.*;
 import com.eco.environet.users.exception.CredentialsTakenException;
 import com.eco.environet.users.model.Gender;
 import com.eco.environet.users.model.Role;
@@ -98,19 +95,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         sendConfirmationEmail(user);
     }
 
-    public AuthenticationResponse changePassword(AuthenticationRequest request) {
-        var user = repository.findByUsername(request.getUsername()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        repository.save(user);
-
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }
-
     @Override
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
@@ -177,5 +161,24 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailBody += "Best regards,\nYour EnviroNet Team";
 
         emailSender.sendEmail(user.getEmail(), "Finalize Registration", emailBody);
+    }
+
+    @Override
+    public boolean checkOldPasswordMatch(AuthenticationRequest request) {
+        var user = repository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return passwordEncoder.matches(request.getPassword(), user.getPassword());
+    }
+
+    @Override
+    public AuthenticationResponse changePassword(AuthenticationRequest request) {
+        var user = repository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        repository.save(user);
+        var jwtToken = jwtService.generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
     }
 }

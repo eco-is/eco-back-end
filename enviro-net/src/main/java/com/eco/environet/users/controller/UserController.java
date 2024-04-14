@@ -1,10 +1,11 @@
 package com.eco.environet.users.controller;
 
-import com.eco.environet.users.dto.AuthenticationRequest;
-import com.eco.environet.users.dto.AuthenticationResponse;
-import com.eco.environet.users.dto.RegisterRequest;
+import com.eco.environet.users.dto.UserInfoDto;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.eco.environet.users.dto.UserDto;
-import com.eco.environet.users.services.AuthenticationService;
 import com.eco.environet.users.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +28,92 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService service;
+
+    @Operation(summary = "Get user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched user",
+            content = { @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = UserInfoDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)})
+    @GetMapping(value="/get-user/{id}")
+    public ResponseEntity<UserInfoDto> getUser(@PathVariable Long id) {
+        // Fetch the currently authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        var result = service.findUser(id);
+        // Check if the authenticated user matches the requested user
+        if (!result.getUsername().equals(currentUsername)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @Operation(summary = "Update user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all organization members",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserInfoDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)})
+    @PutMapping(value="/update-user/{id}")
+    public ResponseEntity<UserInfoDto> updateUser(@PathVariable Long id, @RequestBody UserInfoDto userInfoDto) {
+        // Fetch the currently authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        var result = service.updateUser(userInfoDto);
+
+        // Check if the authenticated user matches the requested user
+        if (!result.getUsername().equals(currentUsername)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @Operation(summary = "Update user email by clicking on confirmation link")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all organization members",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserInfoDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content)})
+    @PutMapping(value="/update-email/{email}")
+    public ResponseEntity<UserInfoDto> updateEmail(@PathVariable String email, @RequestParam("token") String token) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        var result = service.updateUserEmail(currentUsername, email, token);
+
+        // Check if the authenticated user matches the requested user
+        if (!result.getUsername().equals(currentUsername)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        if (result != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
 
     @Operation(summary = "Get all organization members")
     @ApiResponses(value = {
