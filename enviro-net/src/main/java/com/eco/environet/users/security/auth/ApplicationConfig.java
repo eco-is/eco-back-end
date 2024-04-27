@@ -65,9 +65,4 @@ public class ApplicationConfig {
                 .info(new Info().title("EnviroNet API")
                         .version("1.0"));
     }
-
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
 }

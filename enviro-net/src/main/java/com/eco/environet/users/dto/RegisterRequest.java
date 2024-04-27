@@ -23,5 +23,4 @@ public class RegisterRequest {
     private Timestamp dateOfBirth;
     private Integer gender;
     private int role;
-    private int points;
 }
