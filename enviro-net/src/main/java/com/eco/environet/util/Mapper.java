@@ -1,5 +1,7 @@
 package com.eco.environet.util;
 
+import com.eco.environet.education.dto.LectureDto;
+import com.eco.environet.education.model.Lecture;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -20,6 +22,7 @@ public class Mapper {
     static {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper.typeMap(Lecture.class, LectureDto.class).addMappings(mapper -> mapper.map(src -> src.getCreator().getId(), LectureDto::setCreatorId));
     }
 
     static public <T, U> U map(T source, Class<U> targetClass, String... ignoredFields) {
