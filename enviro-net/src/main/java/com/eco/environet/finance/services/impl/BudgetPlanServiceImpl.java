@@ -107,6 +107,10 @@ public class BudgetPlanServiceImpl implements BudgetPlanService {
     }
 
     private void checkStatus(BudgetPlan budget, BudgetPlanDto budgetPlanDto){
+        // If status isn't changed, return
+        if (budget.getStatus().toString().equals(budgetPlanDto.getStatus())){
+            return;
+        }
         // Check if status of old budget plan status is valid
         if (budget.getStatus() != BudgetPlanStatus.DRAFT && budget.getStatus() != BudgetPlanStatus.PENDING) {
             throw new IllegalArgumentException("Can't update budget plan that isn't DRAFT or PENDING.");
