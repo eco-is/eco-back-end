@@ -61,22 +61,6 @@ public class ProjectCreationController {
         return ResponseEntity.ok().build();
     }
 
-//    @Operation(summary = "Add project document")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Document added", content = @Content(mediaType = "text/plain")),
-//            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
-//    })
-//    @PostMapping(value = "/{projectId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectRepository.findById(#projectId).orElse(null)?.manager?.id == authentication.principal.id")
-//    public ResponseEntity<DocumentCreationDto> uploadDocument(
-//            @PathVariable Long projectId,
-//            @RequestPart("documentDto") @Valid DocumentCreationDto documentDto,
-//            @RequestPart("file") MultipartFile file
-//    ) throws IOException {
-//        DocumentCreationDto result = projectCreationService.uploadDocument(projectId, null, file);
-//        return ResponseEntity.ok(result);
-//    }
-
     @Operation(summary = "Add project document")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Document added", content = @Content(mediaType = "application/json")),
@@ -90,5 +74,20 @@ public class ProjectCreationController {
     ) throws IOException {
         DocumentDto result = projectCreationService.uploadDocument(projectId, documentDto);
         return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Delete project document")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Document deleted", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
+    })
+    @DeleteMapping(value = "/{projectId}/documents/{documentId}")
+    @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectRepository.findById(#projectId).orElse(null)?.manager?.id == authentication.principal.id")
+    public ResponseEntity<Void> deleteDocument(
+            @PathVariable Long projectId,
+            @PathVariable Long documentId
+    ) {
+        projectCreationService.deleteDocument(projectId, documentId);
+        return ResponseEntity.ok().build();
     }
 }

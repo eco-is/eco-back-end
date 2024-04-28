@@ -13,4 +13,5 @@ public interface ProjectCreationService {
     ProjectDto update(Long projectId, ProjectUpdateDto updateDto);
     void delete(Long projectId);
     DocumentDto uploadDocument(Long projectId, DocumentCreationDto documentDto) throws IOException;
+    void deleteDocument(Long projectId, Long documentId);
 }

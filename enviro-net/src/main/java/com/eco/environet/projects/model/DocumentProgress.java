@@ -22,16 +22,16 @@ public class DocumentProgress {
     }
 
     private void updateStatus() {
-        if (progress >= 0 && progress < 50) {
+        if (progress == 0) {
+            status = "Not Started";
+        } else if (progress < 50) {
             status = "In Progress - less than halfway";
         } else if (progress == 50) {
             status = "Halfway Done";
         } else if (progress > 50 && progress < 100) {
             status = "In Progress - more than halfway";
-        } else if (progress == 100) {
-            status = "Completed";
         } else {
-            status = "Not Stared";
+            status = "Completed";
         }
     }
 

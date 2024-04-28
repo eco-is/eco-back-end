@@ -18,7 +18,7 @@ public class Document {
     @Id
     private Long projectId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Embedded

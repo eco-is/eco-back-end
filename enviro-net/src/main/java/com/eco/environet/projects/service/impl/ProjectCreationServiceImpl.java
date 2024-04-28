@@ -2,6 +2,8 @@ package com.eco.environet.projects.service.impl;
 
 import com.eco.environet.projects.dto.*;
 import com.eco.environet.projects.model.*;
+import com.eco.environet.projects.model.id.DocumentId;
+import com.eco.environet.projects.model.id.DocumentVersionId;
 import com.eco.environet.projects.repository.DocumentRepository;
 import com.eco.environet.projects.repository.DocumentVersionRepository;
 import com.eco.environet.projects.repository.ProjectRepository;
@@ -24,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -92,7 +95,6 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
     }
 
     public DocumentDto uploadDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
-
         if (projectId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
             throw new IllegalArgumentException("Invalid parameters for document upload");
         }
@@ -101,16 +103,32 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
                 .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
         Path filePath = saveFile(documentDto.getName(), documentDto.getFile(), project.getName());
-        Document savedDocument = createDocument(projectId, documentDto);
+        Document savedDocument = createDocument(projectId, documentDto.getName());
         createDocumentVersion(project, filePath, savedDocument);
 
         return  Mapper.map(savedDocument, DocumentDto.class);
     }
 
-    private Document createDocument(Long projectId, DocumentCreationDto documentDto) {
+    @Override
+    public void deleteDocument(Long projectId, Long documentId) {
+        DocumentId id = new DocumentId(projectId, documentId);
+
+        Document document = documentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        List<DocumentVersion> documentVersions = documentVersionRepository.findByDocumentId(documentId);
+        for (DocumentVersion version : documentVersions) {
+            deleteDocumentVersionFromFileSystem(version.getFilePath());
+        }
+
+        documentVersionRepository.deleteAll(documentVersions);
+        documentRepository.delete(document);
+    }
+
+    private Document createDocument(Long projectId, String documentName) {
         Document document = new Document();
         document.setProjectId(projectId);
-        document.setName(documentDto.getName());
+        document.setName(documentName);
         document.setProgress(new DocumentProgress());
         return documentRepository.save(document);
     }
@@ -130,11 +148,14 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
         try (Stream<Path> paths = Files.list(templatesDir)) {
             paths.forEach(filePath -> {
                 String fileName = filePath.getFileName().toString();
+                String documentName = constructDocumentName(fileName);
                 try {
                     Path projectFolder = createProjectFolder(savedProject.getName());
                     Path destFilePath = Paths.get(projectFolder.toString(), fileName);
                     try {
                         Files.copy(filePath, destFilePath, StandardCopyOption.REPLACE_EXISTING);
+                        Document savedDocument = createDocument(savedProject.getId(), documentName);
+                        createDocumentVersion(savedProject, destFilePath, savedDocument);
                     } catch (IOException e) {
                         throw new RuntimeException("Error copying template file: " + fileName, e);
                     }
@@ -145,6 +166,21 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
         } catch (IOException e) {
             throw new RuntimeException("Error listing template files", e);
         }
+    }
+
+    private String constructDocumentName(String fileName) {
+        String nameWithoutExtension = fileName.replaceAll("\\.[^.]*$", "");
+
+        String[] parts = nameWithoutExtension.split("_");
+        StringBuilder formattedFileName = new StringBuilder();
+        for (String part : parts) {
+            if (formattedFileName.length() > 0) {
+                formattedFileName.append(" ");
+            }
+            formattedFileName.append(part.substring(0, 1).toUpperCase())
+                    .append(part.substring(1).toLowerCase());
+        }
+        return formattedFileName.toString();
     }
 
     private Path saveFile(String documentName, MultipartFile file, String projectName) throws IOException {
@@ -165,5 +201,14 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
             Files.createDirectories(projectFolder);
         }
         return projectFolder;
+    }
+
+    private void deleteDocumentVersionFromFileSystem(String filePath) {
+        try {
+            Path path = Paths.get(filePath);
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
