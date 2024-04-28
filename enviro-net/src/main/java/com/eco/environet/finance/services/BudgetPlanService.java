@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public interface BudgetPlanService {
     BudgetPlanDto create(BudgetPlanDto newBudgetPlan);
-    Page<BudgetPlanDto> findAll(String name, List<String> statuses, Pageable pageable);
+    Page<BudgetPlanDto> findAll(Long currentUserId, String name, List<String> statuses, Pageable pageable);
     BudgetPlanDto findById(Long id);
     BudgetPlanDto update(BudgetPlanDto budgetPlan);
     void archive(BudgetPlanDto budgetPlan);

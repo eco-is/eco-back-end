@@ -52,18 +52,15 @@ public class BudgetPlanServiceImpl implements BudgetPlanService {
     //  TODO - date range filter
     //  TODO - Author search filter
     @Override
-    public Page<BudgetPlanDto> findAll(String name, List<String> statuses, Pageable pageable) {
+    public Page<BudgetPlanDto> findAll(Long currentUserId, String name, List<String> statuses, Pageable pageable) {
         List<BudgetPlanStatus> statusList = getStatusListFromStringList(statuses);
 
         Specification<BudgetPlan> spec = Specification.where(
                 StringUtils.isBlank(name) ? null : BudgetPlanSpecifications.nameLike(name))
-                .and(BudgetPlanSpecifications.statusIn(statusList));
+                .and(BudgetPlanSpecifications.statusIn(statusList, currentUserId));
 
         Page<BudgetPlan> allPlans = repository.findAll(spec, pageable);
         Page<BudgetPlanDto> allPlansDto = Mapper.mapPage(allPlans, BudgetPlanDto.class);
-//        for (BudgetPlanDto dto : allPlansDto){
-//            dto.setStatus(EnumMapper.convertToTitleCase(dto.getStatus()));
-//        }
         return allPlansDto;
     }
 

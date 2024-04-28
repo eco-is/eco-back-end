@@ -71,6 +71,7 @@ public class BudgetPlanController {
     public ResponseEntity<Page<BudgetPlanDto>> getAllBudgetPlans(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
+            @RequestParam(name="id") Long id,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "statuses", required = false) List<String> statuses,
             // TODO filters
@@ -80,7 +81,7 @@ public class BudgetPlanController {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(name, statuses, pageRequest);
+        var result = service.findAll(id, name, statuses, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
