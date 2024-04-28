@@ -1,10 +1,9 @@
 package com.eco.environet.projects.service.impl;
 
-import com.eco.environet.projects.dto.ProjectCreationDto;
-import com.eco.environet.projects.dto.ProjectDto;
-import com.eco.environet.projects.dto.ProjectUpdateDto;
-import com.eco.environet.projects.model.Project;
-import com.eco.environet.projects.model.Status;
+import com.eco.environet.projects.dto.*;
+import com.eco.environet.projects.model.*;
+import com.eco.environet.projects.repository.DocumentRepository;
+import com.eco.environet.projects.repository.DocumentVersionRepository;
 import com.eco.environet.projects.repository.ProjectRepository;
 import com.eco.environet.projects.service.ProjectCreationService;
 import com.eco.environet.users.model.User;
@@ -12,26 +11,49 @@ import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Transactional
 @Service
 public class ProjectCreationServiceImpl implements ProjectCreationService {
 
+    @Value("${projectFilePath}")
+    private String projectFilePath;
     private final ProjectRepository projectRepository;
+    private final DocumentRepository documentRepository;
+    private final DocumentVersionRepository documentVersionRepository;
     private final UserRepository userRepository;
+
     @Override
     public ProjectDto create(ProjectCreationDto projectDto) {
         User manager = userRepository.findById(projectDto.getManagerId())
                 .orElseThrow(() -> new EntityNotFoundException("Manager not found"));
 
-        Project project =  Mapper.map(projectDto, Project.class);
+        Project project = Mapper.map(projectDto, Project.class);
         project.setStatus(Status.DRAFT);
         project.setManager(manager);
 
         Project savedProject = projectRepository.save(project);
+
+        if (savedProject.getType() == Type.INTERNAL) {
+            addTemplates(savedProject);
+        }
 
         return Mapper.map(savedProject, ProjectDto.class);
     }
@@ -67,5 +89,81 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
         } else {
             throw new IllegalStateException("Cannot delete or archive a project with status: " + project.getStatus());
         }
+    }
+
+    public DocumentDto uploadDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
+
+        if (projectId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
+            throw new IllegalArgumentException("Invalid parameters for document upload");
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        Path filePath = saveFile(documentDto.getName(), documentDto.getFile(), project.getName());
+        Document savedDocument = createDocument(projectId, documentDto);
+        createDocumentVersion(project, filePath, savedDocument);
+
+        return  Mapper.map(savedDocument, DocumentDto.class);
+    }
+
+    private Document createDocument(Long projectId, DocumentCreationDto documentDto) {
+        Document document = new Document();
+        document.setProjectId(projectId);
+        document.setName(documentDto.getName());
+        document.setProgress(new DocumentProgress());
+        return documentRepository.save(document);
+    }
+
+    private void createDocumentVersion(Project project, Path filePath, Document savedDocument) {
+        DocumentVersion documentVersion = new DocumentVersion();
+        documentVersion.setVersion(0L);
+        documentVersion.setDocumentId(savedDocument.getDocumentId());
+        documentVersion.setProjectId(savedDocument.getProjectId());
+        documentVersion.setFilePath(filePath.toString());
+        documentVersion.setAuthor(project.getManager());
+        documentVersionRepository.save(documentVersion);
+    }
+
+    private void addTemplates(Project savedProject) {
+        Path templatesDir = Paths.get(projectFilePath, "Templates");
+        try (Stream<Path> paths = Files.list(templatesDir)) {
+            paths.forEach(filePath -> {
+                String fileName = filePath.getFileName().toString();
+                try {
+                    Path projectFolder = createProjectFolder(savedProject.getName());
+                    Path destFilePath = Paths.get(projectFolder.toString(), fileName);
+                    try {
+                        Files.copy(filePath, destFilePath, StandardCopyOption.REPLACE_EXISTING);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error copying template file: " + fileName, e);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (IOException e) {
+            throw new RuntimeException("Error listing template files", e);
+        }
+    }
+
+    private Path saveFile(String documentName, MultipartFile file, String projectName) throws IOException {
+        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        String extension = StringUtils.getFilenameExtension(originalFilename);
+        String filename = documentName.replaceAll("\\s+", "_").toLowerCase() + "_v0." + extension;
+
+        Path projectFolder = createProjectFolder(projectName);
+
+        Path filePath = Paths.get(projectFolder.toString(), filename);
+        Files.copy(file.getInputStream(), filePath);
+        return filePath;
+    }
+
+    private Path createProjectFolder(String projectName) throws IOException {
+        Path projectFolder = Paths.get(projectFilePath + File.separator + projectName);
+        if (!Files.exists(projectFolder)) {
+            Files.createDirectories(projectFolder);
+        }
+        return projectFolder;
     }
 }

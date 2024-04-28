@@ -1,8 +1,6 @@
 package com.eco.environet.projects.controller;
 
-import com.eco.environet.projects.dto.ProjectCreationDto;
-import com.eco.environet.projects.dto.ProjectDto;
-import com.eco.environet.projects.dto.ProjectUpdateDto;
+import com.eco.environet.projects.dto.*;
 import com.eco.environet.projects.service.ProjectCreationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,9 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -30,7 +31,7 @@ public class ProjectCreationController {
     })
     @PostMapping
     @PreAuthorize("hasRole('PROJECT_MANAGER') and #projectDto.managerId == authentication.principal.id")
-    public ResponseEntity<ProjectDto> createProject(@Valid @RequestBody ProjectCreationDto projectDto){
+    public ResponseEntity<ProjectDto> createProject(@Valid @RequestBody ProjectCreationDto projectDto) throws IOException {
         ProjectDto result = projectCreationService.create(projectDto);
         return ResponseEntity.ok(result);
     }
@@ -58,5 +59,36 @@ public class ProjectCreationController {
     public ResponseEntity<Void> deleteProject(@PathVariable Long projectId) {
         projectCreationService.delete(projectId);
         return ResponseEntity.ok().build();
+    }
+
+//    @Operation(summary = "Add project document")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Document added", content = @Content(mediaType = "text/plain")),
+//            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
+//    })
+//    @PostMapping(value = "/{projectId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectRepository.findById(#projectId).orElse(null)?.manager?.id == authentication.principal.id")
+//    public ResponseEntity<DocumentCreationDto> uploadDocument(
+//            @PathVariable Long projectId,
+//            @RequestPart("documentDto") @Valid DocumentCreationDto documentDto,
+//            @RequestPart("file") MultipartFile file
+//    ) throws IOException {
+//        DocumentCreationDto result = projectCreationService.uploadDocument(projectId, null, file);
+//        return ResponseEntity.ok(result);
+//    }
+
+    @Operation(summary = "Add project document")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Document added", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
+    })
+    @PostMapping(value = "/{projectId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectRepository.findById(#projectId).orElse(null)?.manager?.id == authentication.principal.id")
+    public ResponseEntity<DocumentDto> uploadDocument(
+            @PathVariable Long projectId,
+            @ModelAttribute @Valid DocumentCreationDto documentDto
+    ) throws IOException {
+        DocumentDto result = projectCreationService.uploadDocument(projectId, documentDto);
+        return ResponseEntity.ok(result);
     }
 }
