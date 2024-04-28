@@ -1,5 +1,7 @@
 package com.eco.environet.util;
 
+import com.eco.environet.education.dto.LectureDto;
+import com.eco.environet.education.model.Lecture;
 import com.eco.environet.users.dto.UserDto;
 import com.eco.environet.users.model.User;
 import org.modelmapper.ModelMapper;
@@ -20,6 +22,7 @@ public class MapperImpl implements Mapper {
 
     public MapperImpl(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
+        this.modelMapper.typeMap(Lecture.class, LectureDto.class).addMappings(mapper -> mapper.map(src -> src.getCreator().getId(), LectureDto::setCreatorId));
     }
 
     @Override
