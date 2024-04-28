@@ -35,14 +35,12 @@ public class UserServiceImpl implements UserService {
     private final EmailSender emailSender;
     private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
-    private final Mapper mapper;
 
     @Override
     public UserInfoDto findUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + id));
-        UserInfoDto userDto = mapper.map(user, UserInfoDto.class, "password");
-        return userDto;
+        return Mapper.map(user, UserInfoDto.class, "password");
     }
 
     @Override
@@ -61,7 +59,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
-        return  mapper.map(user, UserInfoDto.class, "password");
+        return  Mapper.map(user, UserInfoDto.class, "password");
     }
 
     private void updateEmail(User user, String newEmail){
@@ -100,7 +98,7 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new EntityNotFoundException("User not found with username: " + username));
             user.setEmail(email);
             userRepository.save(user);
-            return mapper.map(user, UserInfoDto.class, "password");
+            return Mapper.map(user, UserInfoDto.class, "password");
         } else {
             throw new BadCredentialsException("Invalid or expired token");
         }
@@ -124,7 +122,7 @@ public class UserServiceImpl implements UserService {
                 .and(UserSpecifications.rolesIn(organizationRoles));
 
         Page<User> members = userRepository.findAll(spec,  pageable);
-        Page<UserDto> memberDtos = mapper.mapPage(members, UserDto.class, "password");
+        Page<UserDto> memberDtos = Mapper.mapPage(members, UserDto.class, "password");
         for (UserDto dto : memberDtos) {
             dto.setRole(EnumMapper.convertToTitleCase(dto.getRole()));
         }
