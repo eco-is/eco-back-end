@@ -22,9 +22,12 @@ public class DateRange {
                        ", endDate=" + endDate + "]";
     }
 
-    public boolean isValid() {
+    public boolean isInFuture() {
         LocalDate currentDate = LocalDate.now();
-        return startDate.isAfter(currentDate) && endDate.isAfter(currentDate) && startDate.isBefore(endDate);
+        return startDate.isAfter(currentDate) && endDate.isAfter(currentDate);
+    }
+    public boolean isValid() {
+        return startDate.isBefore(endDate);
     }
 
     public long getDurationInDays() {

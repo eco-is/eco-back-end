@@ -109,3 +109,12 @@ VALUES
     ('PENDING', '2024-07-01', '2024-09-30', 'Q3 2024 Budget', 'Quarterly Budget Plan', 5, '2024-04-04'),
     ('APPROVED', '2025-01-01', '2025-12-31', '2025 Annual Budget (Approved)', 'Approved Annual Budget Plan', 6, '2024-04-04'),
     ('REJECTED', '2024-07-01', '2024-12-31', '2024 Annual Budget (Rejected)', 'Rejected Annual Budget Plan', 6, '2024-04-04');
+
+INSERT INTO finance.organization_goal (
+    creator, title, start_date, end_date, description, rationale, priority)
+VALUES
+    (9, 'green energy', '2024-01-01', '2025-01-01', 'Focuses on promoting the adoption and utilization of renewable energy sources such as solar, wind, and hydroelectric power to reduce carbon emissions. ', 'By investing in green energy initiatives, the organization aims to transition towards a sustainable and environmentally friendly energy infrastructure.', 1),
+    (8, 'green knowledge', '2024-01-01', '2025-01-01', 'Aims to educate and raise awareness about environmental conservation, sustainability practices, and the importance of preserving natural resources. ', 'Organization seeks to empower individuals and communities with the knowledge and skills needed to contribute to a greener and healthier planet.', 1),
+    (8, 'clean air', '2024-01-01', '2025-01-01', 'This goal is dedicated to combating air pollution and improving air quality in urban and industrial areas. ', 'Organization aims to ensure that everyone has access to clean and breathable air, safeguarding public health and the environment.', 1),
+    (8, 'green city', '2024-01-01', '2025-01-01', 'Envisions transforming urban spaces into sustainable and eco-friendly environments that prioritize green infrastructure', 'Organization seeks to promote sustainable urban development practices that enhance quality of life, biodiversity, and resilience to climate change.', 1),
+    (9, 'nature', '2024-01-01', '2025-01-01', 'Focuses on preserving and protecting natural ecosystems, biodiversity hotspots, and endangered species. ', 'Organization aims to safeguard natural habitats and biodiversity, ensuring that future generations can continue to benefit from the beauty and resources that nature provides.', 1);
