@@ -18,7 +18,7 @@ VALUES
     ('ljubabuba@gmail.com', true, 'Ljubica', 'Atić', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245123', 'ljubica.a', 'EDUCATOR', true, '1994-03-12', 'FEMALE');
 
 -- Education
-INSERT INTO LectureCategory (description)
+INSERT INTO education.lecture_category (description)
 VALUES
     ('Forest Ecosystems'),
     ('Marine Biology'),
@@ -26,9 +26,9 @@ VALUES
     ('Arctic Exploration'),
     ('Rainforest Ecology');
 
-INSERT INTO Lecture (diffuculty, max_recommended_age, min_recommended_age, creator_id, content, name)
+INSERT INTO education.lecture (diffuculty, max_recommended_age, min_recommended_age, creator_id, content, name)
 VALUES
-    (1, 12, 8, 14, '# Introduction to Forest Ecosystems\n' ||
+    (1, 12, 8, 15, '# Introduction to Forest Ecosystems\n' ||
                    'This lecture provides an overview of forest ecosystems, covering various aspects such as biodiversity, ecological interactions, and human impact on forests.\n' ||
                    'Forests are vital for the health of our planet, serving as habitats for countless species and playing a crucial role in carbon sequestration.\n' ||
                    'In this session, we will explore the different layers of a forest, from the forest floor to the emergent layer, and discuss the unique characteristics of each.\n' ||
@@ -38,7 +38,7 @@ VALUES
                    'Furthermore, we will address the threats facing forests today, such as deforestation, habitat fragmentation, and climate change, and discuss strategies for conservation and sustainable management.\n' ||
                    'By the end of this lecture, participants will gain a deeper appreciation for the importance of forests and the urgent need to protect them for future generations.\n',
      'Forest 101'),
-    (2, 14, 10, 14, '# Exploring Marine Habitats\n' ||
+    (2, 14, 10, 15, '# Exploring Marine Habitats\n' ||
                     'Marine habitats encompass a vast and diverse array of ecosystems, ranging from coral reefs and kelp forests to deep-sea trenches and hydrothermal vents.\n' ||
                     'In this lecture, we will embark on a journey beneath the waves to discover the fascinating world of marine life.\n' ||
                     'We will begin by examining the unique physical and chemical properties of the ocean that shape marine habitats and influence the distribution of species.\n' ||
@@ -49,7 +49,7 @@ VALUES
                     'Furthermore, we will address the human impacts on marine habitats, including pollution, overfishing, and climate change, and explore potential solutions to mitigate these threats.\n' ||
                     'By the end of this lecture, participants will develop a deeper understanding of the importance of marine habitats and the urgent need to conserve and protect them for future generations.\n',
      'Marine Life Overview'),
-    (0, 10, 6, 14, '# Adaptations of Desert Animals\n' ||
+    (0, 10, 6, 15, '# Adaptations of Desert Animals\n' ||
                    'Deserts are harsh and unforgiving environments characterized by extreme temperatures, sparse vegetation, and limited water resources.\n' ||
                    'Despite these challenges, desert animals have evolved a remarkable array of adaptations to survive in this hostile habitat.\n' ||
                    'In this lecture, we will explore the fascinating world of desert wildlife and uncover the secrets of their survival.\n' ||
@@ -60,7 +60,7 @@ VALUES
                 'We will also discuss the conservation challenges facing desert ecosystems, including habitat destruction, climate change, and human encroachment, and explore potential conservation strategies.\n' ||
                 'By the end of this lecture, participants will gain a newfound appreciation for the resilience and adaptability of desert animals and the importance of conserving their fragile habitats.\n',
         'Desert Survival'),
-    (1, 16, 12, 14, '# Life in the Arctic\n' ||
+    (1, 16, 12, 15, '# Life in the Arctic\n' ||
                     'The Arctic is a vast and remote region located at the northernmost part of Earth, characterized by icy landscapes, extreme cold, and unique wildlife.\n' ||
                     'In this lecture, we will embark on an expedition to explore the wonders of the Arctic and learn about the remarkable adaptations of its inhabitants.\n' ||
                     'We will begin by examining the physical geography of the Arctic, including its ice caps, glaciers, and permafrost, and discuss the role of the Arctic in regulating global climate patterns.\n' ||
@@ -70,7 +70,7 @@ VALUES
                     'Throughout the lecture, we will address the environmental challenges facing the Arctic, including melting sea ice, habitat loss, and pollution, and discuss efforts to protect this fragile ecosystem.\n' ||
                     'By the end of this lecture, participants will develop a deeper understanding of the Arctic ecosystem and the urgent need to conserve its biodiversity and cultural heritage for future generations.\n',
      'Arctic Adventures'),
-    (0, 8, 4, 14, '# Discovering Rainforest Biodiversity\n' ||
+    (0, 8, 4, 15, '# Discovering Rainforest Biodiversity\n' ||
                   'Rainforests are some of the most biodiverse ecosystems on Earth, teeming with life and exhibiting a remarkable array of plants, animals, and microorganisms.\n' ||
                   'In this lecture, we will venture into the heart of the rainforest to uncover its hidden treasures and explore the wonders of its biodiversity.\n' ||
                   'We will begin by discussing the structure and layers of the rainforest, from the emergent layer to the forest floor, and examine the unique adaptations of plants and animals to life in this dense environment.\n' ||
@@ -81,7 +81,7 @@ VALUES
                   'By the end of this lecture, participants will develop a deeper appreciation for the beauty and complexity of rainforest biodiversity and the urgent need to protect these vital ecosystems.\n',
      'Rainforest Wonders');
 
-INSERT INTO has_category (category_id, lecture_id)
+INSERT INTO education.has_category (category_id, lecture_id)
 VALUES
     (1, 1), -- Forest 101 belongs to Forest Ecosystems category
     (2, 2), -- Marine Life Overview belongs to Marine Biology category

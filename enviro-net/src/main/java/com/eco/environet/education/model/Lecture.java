@@ -19,7 +19,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table
+@Table(name = "lecture", schema = "education")
 @MinMaxAgeConstraint(minField = "minRecommendedAge", maxField = "maxRecommendedAge")
 public class Lecture {
 
@@ -52,6 +52,7 @@ public class Lecture {
     @ManyToMany()
     @JoinTable(
             name = "has_category",
+            schema = "education",
             joinColumns = { @JoinColumn(name = "lecture_id")},
             inverseJoinColumns = { @JoinColumn(name = "category_id")}
     )
