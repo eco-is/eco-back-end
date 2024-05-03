@@ -3,7 +3,6 @@ package com.eco.environet.education.model;
 import com.eco.environet.education.model.constraints.MinMaxAgeConstraint;
 import com.eco.environet.users.model.User;
 import jakarta.persistence.*;
-import jakarta.validation.Payload;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
