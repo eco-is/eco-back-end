@@ -1,7 +1,10 @@
 package com.eco.environet.util;
 
 import com.eco.environet.education.dto.LectureDto;
+import com.eco.environet.education.dto.EducatorQuestionDto;
+import com.eco.environet.education.dto.UserQuestionDto;
 import com.eco.environet.education.model.Lecture;
+import com.eco.environet.education.model.Question;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -23,6 +27,8 @@ public class Mapper {
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.typeMap(Lecture.class, LectureDto.class).addMappings(mapper -> mapper.map(src -> src.getCreator().getId(), LectureDto::setCreatorId));
+        modelMapper.typeMap(Question.class, EducatorQuestionDto.class).addMappings(mapper -> mapper.map(src -> src.getLecture().getId(), EducatorQuestionDto::setLectureId));
+        modelMapper.typeMap(Question.class, UserQuestionDto.class).addMappings(mapper -> mapper.map(src -> src.getLecture().getId(), UserQuestionDto::setLectureId));
     }
 
     static public <T, U> U map(T source, Class<U> targetClass, String... ignoredFields) {
@@ -36,6 +42,12 @@ public class Mapper {
         return sourceList.stream()
                 .map(source -> map(source, targetClass, ignoredFields))
                 .collect(Collectors.toList());
+    }
+
+    static public <T, U> Set<U> mapSet(Set<T> sourceSet, Class<U> targetClass, String... ignoredFields) {
+        return sourceSet.stream()
+                .map(source -> map(source, targetClass, ignoredFields))
+                .collect(Collectors.toSet());
     }
 
     static public <T, U> Page<U> mapPage(Page<T> sourcePage, Class<U> targetClass, String... ignoredFields) {

@@ -30,7 +30,7 @@ public class Lecture {
     @NotBlank(message = "Name cannot be empty")
     private String name;
 
-    @Column(name = "content", nullable = false, length = 10000)
+    @Column(name = "content", nullable = false, length = 20000)
     @NotBlank(message = "Content cannot be empty")
     private String content;
 
@@ -60,5 +60,9 @@ public class Lecture {
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
+
+    public Lecture(Long id) {
+        this.id = id;
+    }
 }
 

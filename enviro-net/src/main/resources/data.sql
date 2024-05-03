@@ -91,6 +91,127 @@ VALUES
     (1, 3), -- Desert Survival also belongs to Forest Ecosystems category
     (3, 1); -- Forest 101 also belongs to Desert Wildlife category
 
+-- Questions and answers for Lecture: Introduction to Forest Ecosystems
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Introduction to Forest Ecosystems" lecture
+    (1, 0, 1, 'What are some key characteristics of forest ecosystems?'),
+    (2, 1, 1, 'True or false: Forests play a minor role in carbon sequestration?'),
+    (3, 2, 1, 'What is the primary threat to forests today?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 1, 'High biodiversity, carbon sequestration, ecological interactions'),
+    (FALSE, 1, 'Low biodiversity, carbon emissions, ecological isolation'),
+    (FALSE, 1, 'High pollution, low biodiversity, extreme temperatures'),
+
+    -- Answers for the second question
+    (FALSE, 2, 'True'),
+    (TRUE, 2, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 3, 'Deforestation'),
+    (FALSE, 3, 'Ocean pollution'),
+    (FALSE, 3, 'Desertification');
+
+-- Questions and answers for Lecture: Exploring Marine Habitats
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Exploring Marine Habitats" lecture
+    (1, 0, 2, 'What are some examples of marine habitats?'),
+    (2, 1, 2, 'Which zone of the ocean receives the least amount of sunlight?'),
+    (3, 2, 2, 'What are some human impacts on marine habitats?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 4, 'Coral reefs, kelp forests, deep-sea trenches'),
+    (FALSE, 4, 'Tundra, rainforests, deserts'),
+    (FALSE, 4, 'Mountains, lakes, rivers'),
+
+    -- Answers for the second question
+    (TRUE, 5, 'Abyssal zone'),
+    (FALSE, 5, 'Sunlit zone'),
+    (FALSE, 5, 'Twilight zone'),
+
+    -- Answers for the third question
+    (TRUE, 6, 'Pollution'),
+    (TRUE, 6, 'Overfishing'),
+    (TRUE, 6, 'Climate change');
+
+-- Questions and answers for Lecture: Adaptations of Desert Animals
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Adaptations of Desert Animals" lecture
+    (1, 0, 3, 'What are some physical adaptations of desert animals?'),
+    (2, 1, 3, 'True or false: Desert animals are primarily active during the day?'),
+    (3, 2, 3, 'What conservation challenges do desert ecosystems face?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 7, 'Water storage, efficient kidneys, large ears'),
+    (FALSE, 7, 'Gills, fins, scales'),
+    (FALSE, 7, 'Wings, feathers, beaks'),
+
+    -- Answers for the second question
+    (FALSE, 8, 'True'),
+    (TRUE, 8, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 9, 'Habitat destruction'),
+    (TRUE, 9, 'Climate change'),
+    (TRUE, 9, 'Human encroachment');
+
+-- Questions and answers for Lecture: Life in the Arctic
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Life in the Arctic" lecture
+    (1, 0, 4, 'What are some characteristics of the Arctic ecosystem?'),
+    (2, 1, 4, 'True or false: Arctic animals do not need to adapt to extreme cold?'),
+    (3, 2, 4, 'What is a significant threat to the Arctic ecosystem?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 10, 'Extreme cold, ice caps, polar bears'),
+    (FALSE, 10, 'Deserts, heat, camels'),
+    (FALSE, 10, 'Tropical climate, rainforests, jaguars'),
+
+    -- Answers for the second question
+    (FALSE, 11, 'True'),
+    (TRUE, 11, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 12, 'Melting sea ice'),
+    (FALSE, 12, 'Desertification'),
+    (FALSE, 12, 'Volcanic eruptions');
+
+-- Questions and answers for Lecture: Discovering Rainforest Biodiversity
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Discovering Rainforest Biodiversity" lecture
+    (1, 0, 5, 'What makes rainforests one of the most biodiverse ecosystems?'),
+    (2, 1, 5, 'True or false: Rainforests have low ecological importance?'),
+    (3, 2, 5, 'What are some conservation challenges facing rainforests?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 13, 'High number of species, dense vegetation, complex interactions'),
+    (FALSE, 13, 'Low number of species, sparse vegetation, simple interactions'),
+    (FALSE, 13, 'Moderate number of species, moderate vegetation, moderate interactions'),
+
+    -- Answers for the second question
+    (FALSE, 14, 'True'),
+    (TRUE, 14, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 15, 'Deforestation'),
+    (TRUE, 15, 'Habitat fragmentation'),
+    (TRUE, 15, 'Climate change');
+
 
 -- Finance
 INSERT INTO accountants (id, wage)

@@ -10,12 +10,13 @@ import com.eco.environet.education.repository.LectureRepository;
 import com.eco.environet.education.services.LectureService;
 import com.eco.environet.users.model.User;
 import com.eco.environet.util.Mapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,21 +48,27 @@ public class LectureServiceImpl implements LectureService {
             );
         }
 
-        return mapper.map(lectureRepository.save(newLecture), LectureDto.class);
+        return Mapper.map(lectureRepository.save(newLecture), LectureDto.class);
     }
 
     @Override
     public List<LectureDto> findAllByCreatorId(Long creatorId) {
-        return mapper.mapList(lectureRepository.findAllByCreator_Id(creatorId).orElseThrow(), LectureDto.class);
+        return Mapper.mapList(lectureRepository.findAllByCreator_Id(creatorId).orElseThrow(), LectureDto.class);
     }
 
     @Override
     public List<LectureDto> findAll() {
-        return mapper.mapList(lectureRepository.findAll(), LectureDto.class);
+        return Mapper.mapList(lectureRepository.findAll(), LectureDto.class);
     }
 
     @Override
     public void delete(Long id) {
         lectureRepository.deleteById(id);
+    }
+
+    @Override
+    public LectureDto findById(Long id) {
+        var result = lectureRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Lecture not found with ID:" + id));
+        return Mapper.map(result, LectureDto.class);
     }
 }
