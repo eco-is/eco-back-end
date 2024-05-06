@@ -75,6 +75,21 @@ public class LectureController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
+    @Operation(summary = "Fetch lecture by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LectureDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content)
+    })
+    @PreAuthorize("hasAnyRole('REGISTERED_USER', 'EDUCATOR')")
+    @GetMapping("/{id}")
+    public ResponseEntity<LectureDto> findById(@PathVariable Long id) {
+        var result = service.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
     @Operation(summary = "Fetch all lecture categories")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
