@@ -33,11 +33,11 @@ public class QuestionServiceImpl implements QuestionService {
                 .lecture(new Lecture(question.getLectureId()))
                 .build();
 
-        var savedQuestion = questionRepository.save(newQuestion);
 
         Set<Answer> answers = Mapper.mapSet(question.getAnswers(), Answer.class);
         answers = answers.stream().map(answerRepository::save).collect(Collectors.toSet());
-        savedQuestion.setAnswers(answers);
+        newQuestion.setAnswers(answers);
+        var savedQuestion = questionRepository.save(newQuestion);
 
         return Mapper.map(savedQuestion, EducatorQuestionDto.class);
     }
