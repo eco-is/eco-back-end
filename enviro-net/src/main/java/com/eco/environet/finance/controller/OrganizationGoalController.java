@@ -1,6 +1,7 @@
 package com.eco.environet.finance.controller;
 
 import com.eco.environet.finance.dto.OrganizationGoalDto;
+import com.eco.environet.finance.dto.OrganizationGoalsSetDto;
 import com.eco.environet.finance.services.OrganizationGoalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -65,11 +66,11 @@ public class OrganizationGoalController {
     })
     @GetMapping(value = "/all")
     @PreAuthorize("hasRole('BOARD_MEMBER')")
-    public ResponseEntity<Page<OrganizationGoalDto>> getAll(
+    public ResponseEntity<Page<OrganizationGoalsSetDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(name = "sort", required = false, defaultValue = "title") String sortField,
-            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
+            @RequestParam(name = "sort", required = false, defaultValue = "validPeriod.startDate") String sortField,
+            @RequestParam(name = "direction", required = false, defaultValue = "desc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
@@ -78,7 +79,36 @@ public class OrganizationGoalController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    // TODO - findCurrent(Pageable pageable);
+    @Operation(summary = "Get current organization goals")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all current organization goals!",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)
+    })
+    @GetMapping(value = "/current")
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<Page<OrganizationGoalDto>> getAllCurrent(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(name = "sort", required = false, defaultValue = "title") String sortField,
+            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
+    ) {
+        Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        var result = service.findCurrent(pageRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 
     @Operation(summary = "Get organization goal by ID")
     @ApiResponses(value = {

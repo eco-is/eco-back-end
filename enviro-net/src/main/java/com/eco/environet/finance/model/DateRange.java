@@ -27,10 +27,16 @@ public class DateRange {
         return startDate.isAfter(currentDate) && endDate.isAfter(currentDate);
     }
     public boolean isValid() {
-        return startDate.isBefore(endDate);
+        if (endDate == null) {
+            return true; // Goal is ongoing
+        } else {
+            return startDate.isBefore(endDate);
+        }
     }
 
     public long getDurationInDays() {
-        return ChronoUnit.DAYS.between(startDate, endDate);
+        //return ChronoUnit.DAYS.between(startDate, endDate);
+        LocalDate endDateToUse = endDate != null ? endDate : LocalDate.now();
+        return ChronoUnit.DAYS.between(startDate, endDateToUse);
     }
 }
