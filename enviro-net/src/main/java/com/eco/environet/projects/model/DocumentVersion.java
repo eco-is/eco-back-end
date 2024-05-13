@@ -2,12 +2,14 @@ package com.eco.environet.projects.model;
 
 import com.eco.environet.projects.model.id.DocumentVersionId;
 import com.eco.environet.users.model.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
 @IdClass(DocumentVersionId.class)
+@Schema(name = "projects")
 @Table(name = "document_versions")
 public class DocumentVersion {
 
@@ -15,12 +17,14 @@ public class DocumentVersion {
     private Long version;
 
     @Id
+    @Column(name = "document_id", nullable = false)
     private Long documentId;
 
     @Id
+    @Column(name = "project_id", nullable = false)
     private Long projectId;
 
-    @Column(nullable = false)
+    @Column(name = "file_path", nullable = false)
     private String filePath;
 
     @ManyToOne

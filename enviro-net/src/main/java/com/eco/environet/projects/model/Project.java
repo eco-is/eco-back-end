@@ -1,6 +1,7 @@
 package com.eco.environet.projects.model;
 
 import com.eco.environet.users.model.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Schema(name = "projects")
 @Table(name = "projects")
 public class Project {
 
@@ -27,7 +29,7 @@ public class Project {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "duration_months", nullable = false)
     private int durationMonths;
 
     @Column(nullable = false)
@@ -40,6 +42,8 @@ public class Project {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
+
     @ManyToOne
+    @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private User manager;
 }

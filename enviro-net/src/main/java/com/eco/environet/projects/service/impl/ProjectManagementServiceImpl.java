@@ -3,17 +3,15 @@ package com.eco.environet.projects.service.impl;
 import com.eco.environet.projects.dto.*;
 import com.eco.environet.projects.model.*;
 import com.eco.environet.projects.model.id.DocumentId;
-import com.eco.environet.projects.model.id.DocumentVersionId;
 import com.eco.environet.projects.repository.DocumentRepository;
 import com.eco.environet.projects.repository.DocumentVersionRepository;
 import com.eco.environet.projects.repository.ProjectRepository;
-import com.eco.environet.projects.service.ProjectCreationService;
+import com.eco.environet.projects.service.ProjectManagementService;
 import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +26,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class ProjectCreationServiceImpl implements ProjectCreationService {
+public class ProjectManagementServiceImpl implements ProjectManagementService {
 
     @Value("${projectFilePath}")
     private String projectFilePath;
@@ -59,6 +56,14 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
         }
 
         return Mapper.map(savedProject, ProjectDto.class);
+    }
+
+    @Override
+    public ProjectDto get(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        return Mapper.map(project, ProjectDto.class);
     }
 
     @Override
@@ -92,37 +97,6 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
         } else {
             throw new IllegalStateException("Cannot delete or archive a project with status: " + project.getStatus());
         }
-    }
-
-    public DocumentDto uploadDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
-        if (projectId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
-            throw new IllegalArgumentException("Invalid parameters for document upload");
-        }
-
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
-
-        Path filePath = saveFile(documentDto.getName(), documentDto.getFile(), project.getName());
-        Document savedDocument = createDocument(projectId, documentDto.getName());
-        createDocumentVersion(project, filePath, savedDocument);
-
-        return  Mapper.map(savedDocument, DocumentDto.class);
-    }
-
-    @Override
-    public void deleteDocument(Long projectId, Long documentId) {
-        DocumentId id = new DocumentId(projectId, documentId);
-
-        Document document = documentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
-
-        List<DocumentVersion> documentVersions = documentVersionRepository.findByDocumentId(documentId);
-        for (DocumentVersion version : documentVersions) {
-            deleteDocumentVersionFromFileSystem(version.getFilePath());
-        }
-
-        documentVersionRepository.deleteAll(documentVersions);
-        documentRepository.delete(document);
     }
 
     private Document createDocument(Long projectId, String documentName) {
@@ -183,32 +157,11 @@ public class ProjectCreationServiceImpl implements ProjectCreationService {
         return formattedFileName.toString();
     }
 
-    private Path saveFile(String documentName, MultipartFile file, String projectName) throws IOException {
-        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String extension = StringUtils.getFilenameExtension(originalFilename);
-        String filename = documentName.replaceAll("\\s+", "_").toLowerCase() + "_v0." + extension;
-
-        Path projectFolder = createProjectFolder(projectName);
-
-        Path filePath = Paths.get(projectFolder.toString(), filename);
-        Files.copy(file.getInputStream(), filePath);
-        return filePath;
-    }
-
     private Path createProjectFolder(String projectName) throws IOException {
         Path projectFolder = Paths.get(projectFilePath + File.separator + projectName);
         if (!Files.exists(projectFolder)) {
             Files.createDirectories(projectFolder);
         }
         return projectFolder;
-    }
-
-    private void deleteDocumentVersionFromFileSystem(String filePath) {
-        try {
-            Path path = Paths.get(filePath);
-            Files.deleteIfExists(path);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
