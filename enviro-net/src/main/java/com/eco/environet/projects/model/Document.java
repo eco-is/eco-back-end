@@ -8,12 +8,11 @@ import lombok.Data;
 @Data
 @Entity
 @IdClass(DocumentId.class)
-@Schema(name = "projects")
 @Table(name = "documents", schema = "projects")
 public class Document {
 
     @Id
-    @SequenceGenerator(name="document_seq", sequenceName="document_table_seq", allocationSize=1)
+    @SequenceGenerator(name="document_seq", sequenceName="document_table_seq", schema = "projects", allocationSize=1)
     @GeneratedValue(generator = "document_seq")
     @Column(name = "document_id", nullable = false)
     private Long documentId;

@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 @Entity
 @IdClass(DocumentVersionId.class)
-@Schema(name = "projects")
 @Table(name = "document_versions", schema = "projects")
 public class DocumentVersion {
 
