@@ -1,5 +1,5 @@
 -- Users
-INSERT INTO users (email, enabled, name, surname, last_password_reset_date, password, phone_number, username, role, active, date_of_birth, gender)
+INSERT INTO users.users (email, enabled, name, surname, last_password_reset_date, password, phone_number, username, role, active, date_of_birth, gender)
 VALUES
     ('peraperic@gmail.com', true, 'Pera', 'Perić', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245234', 'peraperic', 'ADMINISTRATOR', true, '1990-01-01', 'MALE'),
     ('markoni@gmail.com', true, 'Marko', 'Milošević', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245321', 'markom', 'REGISTERED_USER', true, '1985-05-15', 'MALE'),
@@ -214,7 +214,7 @@ VALUES
 
 
 -- Finance
-INSERT INTO accountants (id, wage)
+INSERT INTO users.accountants (id, wage)
 VALUES (5, 18.7), (6, 18.7);
 
 INSERT INTO finance.budget_plan (status,  start_date, end_date, name, description, author, last_updated_on_date)
@@ -232,7 +232,7 @@ VALUES
     ('REJECTED', '2024-07-01', '2024-12-31', '2024 Annual Budget (Rejected)', 'Rejected Annual Budget Plan', 6, '2024-04-04');
 
 -- Projects
-INSERT INTO projects (name, description, duration_months, budget, type, status, manager_id)
+INSERT INTO projects.projects (name, description, duration_months, budget, type, status, manager_id)
 VALUES
     ('Conservation of Wetlands', 'Protecting and restoring wetland ecosystems', 24, 50000.00, 'INTERNAL', 'DRAFT', 9),
     ('Reforestation Initiative', 'Planting trees and restoring forest habitats', 18, 30000.00, 'EXTERNAL', 'PENDING', 9),
@@ -250,7 +250,7 @@ VALUES
     ('Green Buildings Certification Project', 'Promoting eco-friendly building standards', 36, 90000.00, 'EXTERNAL', 'APPROVED', 10),
     ('Climate Change Adaptation Strategy', 'Developing strategies for climate resilience', 24, 70000.00, 'INTERNAL', 'ONGOING', 10);
 
-INSERT INTO documents (document_id, project_id, name, progress, status)
+INSERT INTO projects.documents (document_id, project_id, name, progress, status)
 VALUES
     (1, 1, 'Conservation Plan', 0.25, 'In Progress - less than halfway'), -- Conservation of Wetlands
     (1, 2, 'Reforestation Plan', 0.10, 'In Progress - less than halfway'), -- Reforestation Initiative
@@ -268,7 +268,7 @@ VALUES
     (1, 14, 'Green Buildings Plan', 0.45, 'In Progress - less than halfway'), -- Green Buildings Certification Project
     (1, 15, 'Climate Adaptation Strategy', 0.55, 'In Progress - more than halfway'); -- Climate Change Adaptation Strategy
 
-INSERT INTO document_versions (version, document_id, project_id, file_path, author)
+INSERT INTO projects.document_versions (version, document_id, project_id, file_path, author)
 VALUES
     (1, 1, 1, '/path/to/document1.pdf', 9), -- Conservation of Wetlands
     (1, 2, 2, '/path/to/document2.pdf', 9), -- Reforestation Initiative

@@ -9,7 +9,7 @@ import lombok.Data;
 @Entity
 @IdClass(DocumentId.class)
 @Schema(name = "projects")
-@Table(name = "documents")
+@Table(name = "documents", schema = "projects")
 public class Document {
 
     @Id

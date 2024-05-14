@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name="users")
+@Table(name="users", schema = "users")
 public class User implements UserDetails {
 
     @Id
