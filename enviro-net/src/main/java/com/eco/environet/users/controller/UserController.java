@@ -52,9 +52,9 @@ public class UserController {
 
         var result = service.findUser(id);
         // Check if the authenticated user matches the requested user
-        if (!result.getUsername().equals(currentUsername)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+//        if (!result.getUsername().equals(currentUsername)) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//        }
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

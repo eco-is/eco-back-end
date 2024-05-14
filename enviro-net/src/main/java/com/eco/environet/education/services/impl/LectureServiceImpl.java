@@ -24,7 +24,6 @@ public class LectureServiceImpl implements LectureService {
 
     private final LectureRepository lectureRepository;
     private final LectureCategoryRepository lectureCategoryRepository;
-    private final Mapper mapper;
     @Override
     public LectureDto create(LectureCreationRequest lecture) {
         var newLecture = Lecture.builder()

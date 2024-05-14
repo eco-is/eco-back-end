@@ -1,10 +1,10 @@
 package com.eco.environet.util;
 
-import com.eco.environet.education.dto.LectureDto;
-import com.eco.environet.education.dto.EducatorQuestionDto;
-import com.eco.environet.education.dto.UserQuestionDto;
+import com.eco.environet.education.dto.*;
 import com.eco.environet.education.model.Lecture;
 import com.eco.environet.education.model.Question;
+import com.eco.environet.education.model.QuestionType;
+import com.eco.environet.education.model.TestExecution;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,7 +30,11 @@ public class Mapper {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         modelMapper.typeMap(Lecture.class, LectureDto.class).addMappings(mapper -> mapper.map(src -> src.getCreator().getId(), LectureDto::setCreatorId));
         modelMapper.typeMap(Question.class, EducatorQuestionDto.class).addMappings(mapper -> mapper.map(src -> src.getLecture().getId(), EducatorQuestionDto::setLectureId));
-        modelMapper.typeMap(Question.class, UserQuestionDto.class).addMappings(mapper -> mapper.map(src -> src.getLecture().getId(), UserQuestionDto::setLectureId));
+        modelMapper.typeMap(Question.class, UserQuestionDto.class).addMappings(mapper -> {
+            mapper.map(src -> src.getLecture().getId(), UserQuestionDto::setLectureId);
+        });
+        modelMapper.typeMap(TestExecution.class, TestExecutionDto.class).addMappings(mapper -> mapper.map(src -> src.getUser().getId(), TestExecutionDto::setUserId));
+        modelMapper.typeMap(TestExecution.class, TestExecutionDto.class).addMappings(mapper -> mapper.map(src -> src.getLecture().getId(), TestExecutionDto::setLectureId));
     }
 
     static public <T, U> U map(T source, Class<U> targetClass, String... ignoredFields) {
