@@ -13,6 +13,7 @@ import com.eco.environet.util.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,7 +50,15 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public List<UserQuestionDto> findAllByLectureIdForUser(Long lectureId) {
-        return Mapper.mapList(questionRepository.findAllByLecture_Id(lectureId), UserQuestionDto.class);
+        List<UserQuestionDto> questions = new ArrayList<>();
+        for (Question question : questionRepository.findAllByLecture_Id(lectureId)) {
+            if (question.getType() == QuestionType.FILL_IN) {
+                questions.add(Mapper.map(question, UserQuestionDto.class, "answers"));
+            } else {
+                questions.add(Mapper.map(question, UserQuestionDto.class));
+            }
+        }
+        return questions;
     }
 
     @Override

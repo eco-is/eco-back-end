@@ -35,7 +35,7 @@ public class Lecture {
     private String content;
 
     @Enumerated(EnumType.ORDINAL)
-    @Column(name = "diffuculty", nullable = false)
+    @Column(name = "difficulty", nullable = false)
     private LectureDifficulty difficulty;
 
     @Column(name = "min_recommended_age", nullable = false)

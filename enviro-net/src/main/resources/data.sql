@@ -26,7 +26,7 @@ VALUES
     ('Arctic Exploration'),
     ('Rainforest Ecology');
 
-INSERT INTO education.lecture (diffuculty, max_recommended_age, min_recommended_age, creator_id, content, name)
+INSERT INTO education.lecture (difficulty, max_recommended_age, min_recommended_age, creator_id, content, name)
 VALUES
     (1, 12, 8, 15, E'# Introduction to Forest Ecosystems\n' ||
                    E'This lecture provides an overview of forest ecosystems, covering various aspects such as biodiversity, ecological interactions, and human impact on forests.\n' ||
@@ -211,6 +211,12 @@ VALUES
     (TRUE, 15, 'Deforestation'),
     (TRUE, 15, 'Habitat fragmentation'),
     (TRUE, 15, 'Climate change');
+
+INSERT INTO education.test_execution (finished, points, lecture_id, user_id)
+VALUES
+    (TRUE, 25, 1, 2),
+    (TRUE, 15, 1, 3),
+    (TRUE, 5, 1, 4);
 
 
 -- Finance
