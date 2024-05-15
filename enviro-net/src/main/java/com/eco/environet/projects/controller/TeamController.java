@@ -58,11 +58,12 @@ public class TeamController {
     })
     @PostMapping
     @PreAuthorize("hasRole('PROJECT_MANAGER') and @projectRepository.findById(#teamMemberDto.projectId).orElse(null)?.manager?.id == authentication.principal.id")
-    public ResponseEntity<TeamMemberDto> addTeamMember(@RequestBody TeamMemberCreationDto teamMemberDto)
+    public ResponseEntity<Void> addTeamMember(@RequestBody TeamMemberCreationDto teamMemberDto)
     {
-        var result = teamService.addTeamMember(teamMemberDto);
-        return ResponseEntity.ok(result);
+        teamService.addTeamMember(teamMemberDto);
+        return ResponseEntity.ok().build();
     }
+
     @Operation(summary = "Remove team member")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Removed team member", content = @Content(mediaType = "application/json")),

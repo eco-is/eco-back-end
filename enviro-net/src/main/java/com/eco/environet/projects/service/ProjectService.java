@@ -13,5 +13,6 @@ import java.util.List;
 public interface ProjectService {
 
     Page<ProjectDto> findAllProjects(String name, Pageable pageable);
-    List<DocumentDto> getDocuments(long projectId);
+    ProjectDto getProject(Long projectId);
+    List<DocumentDto> getDocuments(Long projectId);
 }

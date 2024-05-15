@@ -2,11 +2,11 @@ package com.eco.environet.projects.service.impl;
 
 import com.eco.environet.projects.dto.*;
 import com.eco.environet.projects.model.*;
-import com.eco.environet.projects.repository.DocumentRepository;
-import com.eco.environet.projects.repository.ProjectRepository;
-import com.eco.environet.projects.repository.ProjectSpecifications;
+import com.eco.environet.projects.repository.*;
 import com.eco.environet.projects.service.ProjectService;
+import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.Mapper;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final DocumentRepository documentRepository;
+    private final AssignmentRepository assignmentRepository;
 
     @Override
     public Page<ProjectDto> findAllProjects(String name, Pageable pageable) {
@@ -34,9 +36,40 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<DocumentDto> getDocuments(long projectId) {
-       List<Document> documents = documentRepository.findByProjectId(projectId);
+    public ProjectDto getProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
-        return Mapper.mapList(documents, DocumentDto.class);
+        return Mapper.map(project, ProjectDto.class);
+    }
+
+    @Override
+    public List<DocumentDto> getDocuments(Long projectId) {
+        List<Document> documents = documentRepository.findByProjectId(projectId);
+        List<DocumentDto> documentDtos = Mapper.mapList(documents, DocumentDto.class);
+
+        for (DocumentDto documentDto : documentDtos) {
+            List<Assignment> assignments = assignmentRepository.findByDocument(documentDto.getDocumentId(), projectId);
+
+            List<TeamMemberDto> writers = new ArrayList<>();
+            List<TeamMemberDto> reviewers = new ArrayList<>();
+
+            for (Assignment assignment : assignments) {
+                TeamMember teamMember = assignment.getTeamMember();
+                TeamMemberDto teamMemberDto = new TeamMemberDto();
+                teamMemberDto.setId(teamMember.getId());
+                teamMemberDto.setFirstName(teamMember.getUser().getName());
+                teamMemberDto.setLastName(teamMember.getUser().getSurname());
+
+                if (assignment.getTask() == Task.WRITE) {
+                    writers.add(teamMemberDto);
+                } else if (assignment.getTask() == Task.REVIEW) {
+                    reviewers.add(teamMemberDto);
+                }
+            }
+
+            documentDto.setWriters(writers);
+            documentDto.setReviewers(reviewers);}
+        return documentDtos;
     }
 }

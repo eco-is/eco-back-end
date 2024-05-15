@@ -6,8 +6,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Schema(name = "projects")
-@Table(name = "assignments")
+@Table(name = "assignments", schema = "projects")
 public class Assignment {
 
     @Id

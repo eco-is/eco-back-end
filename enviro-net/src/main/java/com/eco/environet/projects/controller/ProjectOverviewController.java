@@ -27,7 +27,7 @@ public class ProjectOverviewController {
 
     @Operation(summary = "Fetch projects with basic info")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fetched project with basic info", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Fetched projects with basic info", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "text/plain"))
     })
     @GetMapping
@@ -45,6 +45,20 @@ public class ProjectOverviewController {
         var result = projectService.findAllProjects(name, pageRequest);
         return ResponseEntity.ok(result);
     }
+
+    @Operation(summary = "Fetch project with basic info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched project with basic info", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "text/plain"))
+    })
+    @GetMapping("/{projectId}")
+    @PreAuthorize("hasRole('PROJECT_MANAGER')")
+    public ResponseEntity<ProjectDto> fetchProject(@PathVariable Long projectId) {
+
+        var result = projectService.getProject(projectId);
+        return ResponseEntity.ok(result);
+    }
+
 
     @Operation(summary = "Fetch documents by project")
     @ApiResponses(value = {

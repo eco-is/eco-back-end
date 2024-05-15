@@ -43,7 +43,7 @@ public class TeamServiceImpl implements TeamService {
                     dto.setFirstName(user.getName());
                     dto.setLastName(user.getSurname());
                     dto.setEmail(user.getEmail());
-                    dto.setRole(user.getRole());
+                    dto.setRole(user.getRole().toString());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -59,14 +59,12 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamMemberDto addTeamMember(TeamMemberCreationDto teamMemberCreationDto) {
+    public void addTeamMember(TeamMemberCreationDto teamMemberCreationDto) {
         Long projectId = teamMemberCreationDto.getProjectId();
         Long userId = teamMemberCreationDto.getUserId();
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Organization Member not found"));
 
-        TeamMember teamMember = teamMemberRepository.save(TeamMember.initalizeTeamMember(projectId, userId));
-
-        return createTeamMemberDto(teamMember);
+        teamMemberRepository.save(TeamMember.initalizeTeamMember(projectId, userId));
     }
 
     @Override
@@ -86,22 +84,30 @@ public class TeamServiceImpl implements TeamService {
         List<TeamMember> reviewers = teamMemberRepository.findAllById(assignmentDto.getReviewerIds());
         validateTeamMembers(reviewers, writers, projectId);
 
-        List<Assignment> writerAssignments = writers.stream()
-                .map(writer -> createAssignment(document, writer, Task.WRITE))
-                .collect(Collectors.toList());
-
-        List<Assignment> reviewerAssignments = reviewers.stream()
-                .map(reviewer -> createAssignment(document, reviewer, Task.REVIEW))
-                .collect(Collectors.toList());
-
-        assignmentRepository.saveAll(reviewerAssignments);
-        assignmentRepository.saveAll(writerAssignments);
+        assign(document, writers, reviewers);
 
         DocumentDto documentDto = Mapper.map(document, DocumentDto.class);
         documentDto.setWriters(Mapper.mapList(writers, TeamMemberDto.class));
         documentDto.setReviewers(Mapper.mapList(reviewers, TeamMemberDto.class));
 
         return documentDto;
+    }
+
+    private void assign(Document document, List<TeamMember> writers, List<TeamMember> reviewers) {
+        List<Assignment> currentAssignments = assignmentRepository.findByDocument(
+                document.getDocumentId(), document.getProjectId());
+
+        List<Assignment> writerAssignments = writers.stream()
+                .map(writer -> createAssignment(document, writer, Task.WRITE))
+                .toList();
+
+        List<Assignment> reviewerAssignments = reviewers.stream()
+                .map(reviewer -> createAssignment(document, reviewer, Task.REVIEW))
+                .toList();
+
+        assignmentRepository.deleteAll(currentAssignments);
+        assignmentRepository.saveAll(reviewerAssignments);
+        assignmentRepository.saveAll(writerAssignments);
     }
 
     private List<User> filterTeamMembers(Long projectId) {
@@ -125,7 +131,7 @@ public class TeamServiceImpl implements TeamService {
         teamMemberDto.setFirstName(teamMember.getUser().getName());
         teamMemberDto.setLastName(teamMember.getUser().getSurname());
         teamMemberDto.setEmail(teamMember.getUser().getEmail());
-        teamMemberDto.setRole(teamMember.getUser().getRole());
+        teamMemberDto.setRole(teamMember.getUser().getRole().toString());
 
         return teamMemberDto;
     }

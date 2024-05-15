@@ -10,7 +10,7 @@ public interface TeamService {
 
     List<TeamMemberDto> findAvailableMembers(Long projectId);
     List<TeamMemberDto> findTeamMembers(Long projectId);
-    TeamMemberDto addTeamMember(TeamMemberCreationDto teamMemberDto);
+    void addTeamMember(TeamMemberCreationDto teamMemberDto);
     void removeTeamMember(Long memberId);
     DocumentDto assignTeamMembers(Long projectId, AssignmentDto assignmentDto);
 }

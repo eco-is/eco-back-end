@@ -13,9 +13,7 @@ public class AssignmentDto {
     @NotBlank(message = "Document is required")
     private Long documentId;
 
-    @NotBlank(message = "At least one reviewer is required")
     private List<Long> reviewerIds;
 
-    @NotBlank(message = "At least one writer is required")
     private List<Long> writerIds;
 }

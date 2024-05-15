@@ -12,5 +12,5 @@ public class TeamMemberDto {
     private String firstName;
     private String lastName;
     private String email;
-    private Role role;
+    private String role;
 }
