@@ -30,7 +30,7 @@ public class BudgetPlanServiceImpl implements BudgetPlanService {
 
     @Override
     public BudgetPlanDto create(BudgetPlanDto newBudgetPlan){
-        if (!newBudgetPlan.getFiscalDateRange().isValid()){
+        if (!newBudgetPlan.getFiscalDateRange().isValid() || !newBudgetPlan.getFiscalDateRange().isInFuture()) {
             throw new IllegalArgumentException("Invalid fiscal date range");
         }
         Accountant author = new Accountant();

@@ -1,10 +1,8 @@
 package com.eco.environet.finance.controller;
 
-import com.eco.environet.finance.dto.BudgetPlanDto;
-import com.eco.environet.finance.services.BudgetPlanService;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.eco.environet.finance.dto.OrganizationGoalDto;
+import com.eco.environet.finance.dto.OrganizationGoalsSetDto;
+import com.eco.environet.finance.services.OrganizationGoalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,22 +15,21 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/budget-plan")
+@RequestMapping("/api/goal")
 @RequiredArgsConstructor
-@Tag(name = "Budget Plan", description = "Manage budget plans")
-public class BudgetPlanController {
-    private final BudgetPlanService service;
+@Tag(name = "Organization Goals", description = "Board Members manage organization goals")
+public class OrganizationGoalController {
+    private final OrganizationGoalService service;
 
-    @Operation(summary = "Create new budget plan")
+    @Operation(summary = "Create new organization goal")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "New budget plan created!",
+            @ApiResponse(responseCode = "200", description = "New organization goal created!",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BudgetPlanDto.class)) }),
+                            schema = @Schema(implementation = OrganizationGoalDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -45,14 +42,15 @@ public class BudgetPlanController {
                     content = @Content)
     })
     @PostMapping(value = "/create", consumes = "application/json")
-    public ResponseEntity<BudgetPlanDto> createNewBudgetPlan(@RequestBody BudgetPlanDto newBudgetPlanDto) {
-        var result = service.create(newBudgetPlanDto);
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<OrganizationGoalDto> createNewGoal(@RequestBody OrganizationGoalDto newGoalDto) {
+        var result = service.create(newGoalDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    @Operation(summary = "Get all budget plans")
+    @Operation(summary = "Get all organization goals")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fetched all budget plans",
+            @ApiResponse(responseCode = "200", description = "Fetched all organization goals!",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Page.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
@@ -66,30 +64,26 @@ public class BudgetPlanController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)
     })
-    @GetMapping(value="/all-plans")
-    @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
-    public ResponseEntity<Page<BudgetPlanDto>> getAllBudgetPlans(
+    @GetMapping(value = "/all")
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<Page<OrganizationGoalsSetDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(name="id") Long id,
-            @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "statuses", required = false) List<String> statuses,
-            // TODO filters
-            @RequestParam(name = "sort", required = false, defaultValue = "name") String sortField,
-            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
+            @RequestParam(name = "sort", required = false, defaultValue = "validPeriod.startDate") String sortField,
+            @RequestParam(name = "direction", required = false, defaultValue = "desc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(id, name, statuses, pageRequest);
+        var result = service.findAll(pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @Operation(summary = "Get budget plan")
+    @Operation(summary = "Get current organization goals")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fetched user",
+            @ApiResponse(responseCode = "200", description = "Fetched current organization goals set!",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BudgetPlanDto.class)) }),
+                            schema = @Schema(implementation = OrganizationGoalsSetDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -99,19 +93,42 @@ public class BudgetPlanController {
             @ApiResponse(responseCode = "404", description = "Not Found",
                     content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
-                    content = @Content)})
-    @GetMapping(value="/get-budget/{id}")
-    @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
-    public ResponseEntity<BudgetPlanDto> getBudgetPlan(@PathVariable Long id){
+                    content = @Content)
+    })
+    @GetMapping(value = "/current")
+    public ResponseEntity<OrganizationGoalsSetDto> getAllCurrent() {
+        var result = service.findCurrent();
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @Operation(summary = "Get organization goal by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched organization goal!",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationGoalDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)
+    })
+    @GetMapping(value = "/get/{id}")
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<OrganizationGoalDto> getGoal(@PathVariable Long id) {
         var result = service.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @Operation(summary = "Accountant updates budget plan")
+    @Operation(summary = "Update organization goal by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Budget plan updated!",
+            @ApiResponse(responseCode = "200", description = "Updated organization goal!",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BudgetPlanDto.class)) }),
+                            schema = @Schema(implementation = OrganizationGoalDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -124,22 +141,17 @@ public class BudgetPlanController {
                     content = @Content)
     })
     @PutMapping(value = "/update")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
-    public ResponseEntity<BudgetPlanDto> updateNewBudgetPlan(@RequestBody BudgetPlanDto budgetPlanDto) {
-        // Check if authenticated user matches the author of budget plan
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        if (!currentUsername.equals(budgetPlanDto.getAuthor().getUsername())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        var result = service.update(budgetPlanDto);
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<OrganizationGoalDto> update(@RequestBody OrganizationGoalDto newGoalDto) {
+        var result = service.update(newGoalDto);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
-    @Operation(summary = "Accountant can archive a budget plan by ID")
+    @Operation(summary = "Delete organization goal")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Budget plan archived successfully"),
+            @ApiResponse(responseCode = "200", description = "Updated organization goal!",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationGoalDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -151,23 +163,19 @@ public class BudgetPlanController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)
     })
-    @PutMapping("/archive")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
-    public ResponseEntity<Void> archiveBudgetPlan(@RequestBody BudgetPlanDto budgetPlanDto) {
-        // Check if authenticated user matches the author of budget plan
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        if (!currentUsername.equals(budgetPlanDto.getAuthor().getUsername())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        service.archive(budgetPlanDto);
+    @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<OrganizationGoalDto> delete(
+            @PathVariable Long id) {
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Accountant closes a budget plan by ID")
+    @Operation(summary = "Publish new valid organization goal set")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Budget plan closed successfully"),
+            @ApiResponse(responseCode = "200", description = "Published new valid organization goal set!",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationGoalsSetDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -179,17 +187,10 @@ public class BudgetPlanController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)
     })
-    @PutMapping("/close")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
-    public ResponseEntity<Void> closeBudgetPlan(@RequestBody BudgetPlanDto budgetPlanDto) {
-        // Check if authenticated user matches the author of budget plan
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        if (!currentUsername.equals(budgetPlanDto.getAuthor().getUsername())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
-        service.close(budgetPlanDto);
-        return ResponseEntity.noContent().build();
+    @PutMapping(value = "/publish")
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<OrganizationGoalsSetDto> publish(@RequestBody OrganizationGoalsSetDto newGoalsSetDto) {
+        var result = service.publish(newGoalsSetDto);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }
