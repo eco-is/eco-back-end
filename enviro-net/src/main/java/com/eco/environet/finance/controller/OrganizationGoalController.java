@@ -179,4 +179,27 @@ public class OrganizationGoalController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Publish new valid organization goal set")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Published new valid organization goal set!",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = OrganizationGoalsSetDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)
+    })
+    @PutMapping(value = "/publish")
+    @PreAuthorize("hasRole('BOARD_MEMBER')")
+    public ResponseEntity<OrganizationGoalsSetDto> publish(@RequestBody OrganizationGoalsSetDto newGoalsSetDto) {
+        var result = service.publish(newGoalsSetDto);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 }

@@ -7,10 +7,13 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
 @Data
-@NoArgsConstructor
 public class DateRange {
     private LocalDate startDate;
     private LocalDate endDate;
+    public DateRange(){
+        this.startDate = LocalDate.now();
+        this.endDate = null;
+    }
     public DateRange(LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.endDate = endDate;

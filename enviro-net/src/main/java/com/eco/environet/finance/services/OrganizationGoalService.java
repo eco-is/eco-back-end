@@ -14,4 +14,5 @@ public interface OrganizationGoalService {
     OrganizationGoalDto findById(Long id);
     OrganizationGoalDto update(OrganizationGoalDto oldGoal);
     void delete(Long id);
+    OrganizationGoalsSetDto publish(OrganizationGoalsSetDto newValid);
 }

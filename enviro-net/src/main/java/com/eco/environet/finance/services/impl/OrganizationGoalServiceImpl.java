@@ -1,5 +1,6 @@
 package com.eco.environet.finance.services.impl;
 
+import com.eco.environet.finance.dto.AccountantDto;
 import com.eco.environet.finance.model.OrganizationGoalStatus;
 import com.eco.environet.finance.services.OrganizationGoalService;
 import com.eco.environet.users.model.User;
@@ -18,6 +19,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -113,5 +117,36 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
                 .orElseThrow(() -> new EntityNotFoundException("Organization goal not found with ID: " + id));
 
         repository.delete(goal);
+    }
+
+    @Override
+    public OrganizationGoalsSetDto publish(OrganizationGoalsSetDto newValid) {
+        List<OrganizationGoalDto> newValidGoalsList = new ArrayList<>();
+        DateRange period = new DateRange();
+
+        // update old VALID set to ARCHIVED
+        Page<OrganizationGoal> currentGoals = repository.findByValidPeriodEndDateIsNull(Pageable.unpaged());
+        for (OrganizationGoal goal: currentGoals){
+            goal.setValidPeriod(new DateRange(goal.getValidPeriod().getStartDate(), LocalDate.now()));
+            goal.setStatus(OrganizationGoalStatus.ARCHIVED);
+            repository.save(goal);
+        }
+        // set DRAFT set to new VALID set
+        for (OrganizationGoalDto goal: newValid.getGoals()){
+            if(!goal.getStatus().equals("DRAFT")){
+                throw new IllegalArgumentException("Invalid organization goal set. Set has to be draft to be published!");
+            } else {
+                OrganizationGoal updateGoal = repository.findById(goal.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Organization goal not found with ID: " + goal.getId()));
+                updateGoal.setValidPeriod(period);
+                updateGoal.setStatus(OrganizationGoalStatus.VALID);
+                repository.save(updateGoal);
+                AccountantDto creator = new AccountantDto(updateGoal.getCreator().getId(),updateGoal.getCreator().getUsername(),updateGoal.getCreator().getName(),updateGoal.getCreator().getSurname(),updateGoal.getCreator().getEmail());
+                newValidGoalsList.add(new OrganizationGoalDto(updateGoal.getId(), updateGoal.getTitle(), updateGoal.getDescription(), updateGoal.getRationale(), updateGoal.getPriority(), updateGoal.getStatus().toString(), updateGoal.getValidPeriod(), creator));
+            }
+        }
+
+        newValid.setGoals(newValidGoalsList);
+        return newValid;
     }
 }
