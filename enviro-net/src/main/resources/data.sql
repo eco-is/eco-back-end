@@ -1,5 +1,5 @@
 -- Users
-INSERT INTO users (email, enabled, name, surname, last_password_reset_date, password, phone_number, username, role, active, date_of_birth, gender)
+INSERT INTO users.users (email, enabled, name, surname, last_password_reset_date, password, phone_number, username, role, active, date_of_birth, gender)
 VALUES
     ('peraperic@gmail.com', true, 'Pera', 'Perić', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245234', 'peraperic', 'ADMINISTRATOR', true, '1990-01-01', 'MALE'),
     ('markoni@gmail.com', true, 'Marko', 'Milošević', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245321', 'markom', 'REGISTERED_USER', true, '1985-05-15', 'MALE'),
@@ -18,7 +18,7 @@ VALUES
     ('ljubabuba@gmail.com', true, 'Ljubica', 'Atić', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245123', 'ljubica.a', 'EDUCATOR', true, '1994-03-12', 'FEMALE');
 
 -- Education
-INSERT INTO LectureCategory (description)
+INSERT INTO education.lecture_category (description)
 VALUES
     ('Forest Ecosystems'),
     ('Marine Biology'),
@@ -26,62 +26,62 @@ VALUES
     ('Arctic Exploration'),
     ('Rainforest Ecology');
 
-INSERT INTO Lecture (diffuculty, max_recommended_age, min_recommended_age, creator_id, content, name)
+INSERT INTO education.lecture (difficulty, max_recommended_age, min_recommended_age, creator_id, content, name)
 VALUES
-    (1, 12, 8, 14, '# Introduction to Forest Ecosystems\n' ||
-                   'This lecture provides an overview of forest ecosystems, covering various aspects such as biodiversity, ecological interactions, and human impact on forests.\n' ||
-                   'Forests are vital for the health of our planet, serving as habitats for countless species and playing a crucial role in carbon sequestration.\n' ||
-                   'In this session, we will explore the different layers of a forest, from the forest floor to the emergent layer, and discuss the unique characteristics of each.\n' ||
-                   'Additionally, we will delve into the various types of forests found around the world, including tropical rainforests, temperate forests, and boreal forests.\n' ||
-                   'Throughout the lecture, we will examine the complex relationships between plants, animals, and microorganisms that make up forest ecosystems.\n' ||
-                   'Topics such as nutrient cycling, energy flow, and ecological succession will be explored to provide a comprehensive understanding of forest dynamics.\n' ||
-                   'Furthermore, we will address the threats facing forests today, such as deforestation, habitat fragmentation, and climate change, and discuss strategies for conservation and sustainable management.\n' ||
-                   'By the end of this lecture, participants will gain a deeper appreciation for the importance of forests and the urgent need to protect them for future generations.\n',
+    (1, 12, 8, 15, E'# Introduction to Forest Ecosystems\n' ||
+                   E'This lecture provides an overview of forest ecosystems, covering various aspects such as biodiversity, ecological interactions, and human impact on forests.\n' ||
+                   E'Forests are vital for the health of our planet, serving as habitats for countless species and playing a crucial role in carbon sequestration.\n' ||
+                   E'In this session, we will explore the different layers of a forest, from the forest floor to the emergent layer, and discuss the unique characteristics of each.\n' ||
+                   E'Additionally, we will delve into the various types of forests found around the world, including tropical rainforests, temperate forests, and boreal forests.\n' ||
+                   E'Throughout the lecture, we will examine the complex relationships between plants, animals, and microorganisms that make up forest ecosystems.\n' ||
+                   E'Topics such as nutrient cycling, energy flow, and ecological succession will be explored to provide a comprehensive understanding of forest dynamics.\n' ||
+                   E'Furthermore, we will address the threats facing forests today, such as deforestation, habitat fragmentation, and climate change, and discuss strategies for conservation and sustainable management.\n' ||
+                   E'By the end of this lecture, participants will gain a deeper appreciation for the importance of forests and the urgent need to protect them for future generations.\n',
      'Forest 101'),
-    (2, 14, 10, 14, '# Exploring Marine Habitats\n' ||
-                    'Marine habitats encompass a vast and diverse array of ecosystems, ranging from coral reefs and kelp forests to deep-sea trenches and hydrothermal vents.\n' ||
-                    'In this lecture, we will embark on a journey beneath the waves to discover the fascinating world of marine life.\n' ||
-                    'We will begin by examining the unique physical and chemical properties of the ocean that shape marine habitats and influence the distribution of species.\n' ||
-                    'From there, we will explore the incredible diversity of marine organisms, from microscopic plankton to majestic whales, and everything in between.\n' ||
-                    'Participants will learn about the different zones of the ocean, including the sunlit surface waters, the twilight zone, and the dark depths of the abyss.\n' ||
-                    'Throughout the lecture, we will discuss the various adaptations that enable marine organisms to thrive in their respective environments, from camouflage and bioluminescence to hydrodynamic shapes and specialized organs.\n' ||
-                    'We will also examine the complex ecological relationships that exist within marine ecosystems, such as predator-prey interactions, symbiotic partnerships, and competitive exclusion.\n' ||
-                    'Furthermore, we will address the human impacts on marine habitats, including pollution, overfishing, and climate change, and explore potential solutions to mitigate these threats.\n' ||
-                    'By the end of this lecture, participants will develop a deeper understanding of the importance of marine habitats and the urgent need to conserve and protect them for future generations.\n',
+    (2, 14, 10, 15, E'# Exploring Marine Habitats\n' ||
+                    E'Marine habitats encompass a vast and diverse array of ecosystems, ranging from coral reefs and kelp forests to deep-sea trenches and hydrothermal vents.\n' ||
+                    E'In this lecture, we will embark on a journey beneath the waves to discover the fascinating world of marine life.\n' ||
+                    E'We will begin by examining the unique physical and chemical properties of the ocean that shape marine habitats and influence the distribution of species.\n' ||
+                    E'From there, we will explore the incredible diversity of marine organisms, from microscopic plankton to majestic whales, and everything in between.\n' ||
+                    E'Participants will learn about the different zones of the ocean, including the sunlit surface waters, the twilight zone, and the dark depths of the abyss.\n' ||
+                    E'Throughout the lecture, we will discuss the various adaptations that enable marine organisms to thrive in their respective environments, from camouflage and bioluminescence to hydrodynamic shapes and specialized organs.\n' ||
+                    E'We will also examine the complex ecological relationships that exist within marine ecosystems, such as predator-prey interactions, symbiotic partnerships, and competitive exclusion.\n' ||
+                    E'Furthermore, we will address the human impacts on marine habitats, including pollution, overfishing, and climate change, and explore potential solutions to mitigate these threats.\n' ||
+                    E'By the end of this lecture, participants will develop a deeper understanding of the importance of marine habitats and the urgent need to conserve and protect them for future generations.\n',
      'Marine Life Overview'),
-    (0, 10, 6, 14, '# Adaptations of Desert Animals\n' ||
-                   'Deserts are harsh and unforgiving environments characterized by extreme temperatures, sparse vegetation, and limited water resources.\n' ||
-                   'Despite these challenges, desert animals have evolved a remarkable array of adaptations to survive in this hostile habitat.\n' ||
-                   'In this lecture, we will explore the fascinating world of desert wildlife and uncover the secrets of their survival.\n' ||
-                   'We will begin by discussing the physical adaptations of desert animals, such as camels'' humps for water storage, kangaroos'' efficient kidneys for water conservation, and fennec foxes'' large ears for heat regulation.\n' ||
-                'Participants will learn about the behavioral adaptations employed by desert animals to cope with the scarcity of resources, including nocturnal activity to avoid daytime heat, burrowing to escape temperature extremes, and communal living for protection.\n' ||
-                'Furthermore, we will examine the ecological roles played by desert species in maintaining ecosystem balance, such as pollination, seed dispersal, and predator-prey dynamics.\n' ||
-                'Throughout the lecture, we will highlight some of the iconic desert animals, including the Arabian camel, the desert tortoise, the meerkat, and the sidewinder rattlesnake.\n' ||
-                'We will also discuss the conservation challenges facing desert ecosystems, including habitat destruction, climate change, and human encroachment, and explore potential conservation strategies.\n' ||
-                'By the end of this lecture, participants will gain a newfound appreciation for the resilience and adaptability of desert animals and the importance of conserving their fragile habitats.\n',
+    (0, 10, 6, 15, E'# Adaptations of Desert Animals\n' ||
+                   E'Deserts are harsh and unforgiving environments characterized by extreme temperatures, sparse vegetation, and limited water resources.\n' ||
+                   E'Despite these challenges, desert animals have evolved a remarkable array of adaptations to survive in this hostile habitat.\n' ||
+                   E'In this lecture, we will explore the fascinating world of desert wildlife and uncover the secrets of their survival.\n' ||
+                   E'We will begin by discussing the physical adaptations of desert animals, such as camels'' humps for water storage, kangaroos'' efficient kidneys for water conservation, and fennec foxes'' large ears for heat regulation.\n' ||
+                   E'Participants will learn about the behavioral adaptations employed by desert animals to cope with the scarcity of resources, including nocturnal activity to avoid daytime heat, burrowing to escape temperature extremes, and communal living for protection.\n' ||
+                   E'Furthermore, we will examine the ecological roles played by desert species in maintaining ecosystem balance, such as pollination, seed dispersal, and predator-prey dynamics.\n' ||
+                   E'Throughout the lecture, we will highlight some of the iconic desert animals, including the Arabian camel, the desert tortoise, the meerkat, and the sidewinder rattlesnake.\n' ||
+                   E'We will also discuss the conservation challenges facing desert ecosystems, including habitat destruction, climate change, and human encroachment, and explore potential conservation strategies.\n' ||
+                   E'By the end of this lecture, participants will gain a newfound appreciation for the resilience and adaptability of desert animals and the importance of conserving their fragile habitats.\n',
         'Desert Survival'),
-    (1, 16, 12, 14, '# Life in the Arctic\n' ||
-                    'The Arctic is a vast and remote region located at the northernmost part of Earth, characterized by icy landscapes, extreme cold, and unique wildlife.\n' ||
-                    'In this lecture, we will embark on an expedition to explore the wonders of the Arctic and learn about the remarkable adaptations of its inhabitants.\n' ||
-                    'We will begin by examining the physical geography of the Arctic, including its ice caps, glaciers, and permafrost, and discuss the role of the Arctic in regulating global climate patterns.\n' ||
-                    'Participants will discover the rich biodiversity of the Arctic, from polar bears and Arctic foxes to seals, whales, and migratory birds.\n' ||
-                    'We will delve into the unique adaptations of Arctic animals, such as thick fur and blubber for insulation, specialized paws for walking on ice, and hibernation strategies to survive the long winter months.\n' ||
-                    'Furthermore, we will explore the cultural heritage of the indigenous peoples of the Arctic, including their traditional knowledge, art, and ways of life.\n' ||
-                    'Throughout the lecture, we will address the environmental challenges facing the Arctic, including melting sea ice, habitat loss, and pollution, and discuss efforts to protect this fragile ecosystem.\n' ||
-                    'By the end of this lecture, participants will develop a deeper understanding of the Arctic ecosystem and the urgent need to conserve its biodiversity and cultural heritage for future generations.\n',
+    (1, 16, 12, 15, E'# Life in the Arctic\n' ||
+                    E'The Arctic is a vast and remote region located at the northernmost part of Earth, characterized by icy landscapes, extreme cold, and unique wildlife.\n' ||
+                    E'In this lecture, we will embark on an expedition to explore the wonders of the Arctic and learn about the remarkable adaptations of its inhabitants.\n' ||
+                    E'We will begin by examining the physical geography of the Arctic, including its ice caps, glaciers, and permafrost, and discuss the role of the Arctic in regulating global climate patterns.\n' ||
+                    E'Participants will discover the rich biodiversity of the Arctic, from polar bears and Arctic foxes to seals, whales, and migratory birds.\n' ||
+                    E'We will delve into the unique adaptations of Arctic animals, such as thick fur and blubber for insulation, specialized paws for walking on ice, and hibernation strategies to survive the long winter months.\n' ||
+                    E'Furthermore, we will explore the cultural heritage of the indigenous peoples of the Arctic, including their traditional knowledge, art, and ways of life.\n' ||
+                    E'Throughout the lecture, we will address the environmental challenges facing the Arctic, including melting sea ice, habitat loss, and pollution, and discuss efforts to protect this fragile ecosystem.\n' ||
+                    E'By the end of this lecture, participants will develop a deeper understanding of the Arctic ecosystem and the urgent need to conserve its biodiversity and cultural heritage for future generations.\n',
      'Arctic Adventures'),
-    (0, 8, 4, 14, '# Discovering Rainforest Biodiversity\n' ||
-                  'Rainforests are some of the most biodiverse ecosystems on Earth, teeming with life and exhibiting a remarkable array of plants, animals, and microorganisms.\n' ||
-                  'In this lecture, we will venture into the heart of the rainforest to uncover its hidden treasures and explore the wonders of its biodiversity.\n' ||
-                  'We will begin by discussing the structure and layers of the rainforest, from the emergent layer to the forest floor, and examine the unique adaptations of plants and animals to life in this dense environment.\n' ||
-                  'Participants will learn about the intricate web of ecological relationships that exist within the rainforest, including symbiotic interactions, predator-prey dynamics, and nutrient cycling.\n' ||
-                  'We will highlight some of the iconic species found in the rainforest, such as jaguars, toucans, orchids, and giant ceiba trees, and discuss their ecological importance.\n' ||
-                  'Furthermore, we will explore the cultural significance of rainforests to indigenous peoples, including their traditional knowledge, spiritual beliefs, and sustainable practices.\n' ||
-                  'Throughout the lecture, we will address the threats facing rainforest ecosystems, including deforestation, habitat fragmentation, and climate change, and discuss strategies for conservation and sustainable management.\n' ||
-                  'By the end of this lecture, participants will develop a deeper appreciation for the beauty and complexity of rainforest biodiversity and the urgent need to protect these vital ecosystems.\n',
+    (0, 8, 4, 15, E'# Discovering Rainforest Biodiversity\n' ||
+                  E'Rainforests are some of the most biodiverse ecosystems on Earth, teeming with life and exhibiting a remarkable array of plants, animals, and microorganisms.\n' ||
+                  E'In this lecture, we will venture into the heart of the rainforest to uncover its hidden treasures and explore the wonders of its biodiversity.\n' ||
+                  E'We will begin by discussing the structure and layers of the rainforest, from the emergent layer to the forest floor, and examine the unique adaptations of plants and animals to life in this dense environment.\n' ||
+                  E'Participants will learn about the intricate web of ecological relationships that exist within the rainforest, including symbiotic interactions, predator-prey dynamics, and nutrient cycling.\n' ||
+                  E'We will highlight some of the iconic species found in the rainforest, such as jaguars, toucans, orchids, and giant ceiba trees, and discuss their ecological importance.\n' ||
+                  E'Furthermore, we will explore the cultural significance of rainforests to indigenous peoples, including their traditional knowledge, spiritual beliefs, and sustainable practices.\n' ||
+                  E'Throughout the lecture, we will address the threats facing rainforest ecosystems, including deforestation, habitat fragmentation, and climate change, and discuss strategies for conservation and sustainable management.\n' ||
+                  E'By the end of this lecture, participants will develop a deeper appreciation for the beauty and complexity of rainforest biodiversity and the urgent need to protect these vital ecosystems.\n',
      'Rainforest Wonders');
 
-INSERT INTO has_category (category_id, lecture_id)
+INSERT INTO education.has_category (category_id, lecture_id)
 VALUES
     (1, 1), -- Forest 101 belongs to Forest Ecosystems category
     (2, 2), -- Marine Life Overview belongs to Marine Biology category
@@ -91,9 +91,136 @@ VALUES
     (1, 3), -- Desert Survival also belongs to Forest Ecosystems category
     (3, 1); -- Forest 101 also belongs to Desert Wildlife category
 
+-- Questions and answers for Lecture: Introduction to Forest Ecosystems
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Introduction to Forest Ecosystems" lecture
+    (1, 0, 1, 'What are some key characteristics of forest ecosystems?'),
+    (2, 1, 1, 'True or false: Forests play a minor role in carbon sequestration?'),
+    (3, 2, 1, 'What is the primary threat to forests today?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 1, 'High biodiversity, carbon sequestration, ecological interactions'),
+    (FALSE, 1, 'Low biodiversity, carbon emissions, ecological isolation'),
+    (FALSE, 1, 'High pollution, low biodiversity, extreme temperatures'),
+
+    -- Answers for the second question
+    (FALSE, 2, 'True'),
+    (TRUE, 2, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 3, 'Deforestation'),
+    (FALSE, 3, 'Ocean pollution'),
+    (FALSE, 3, 'Desertification');
+
+-- Questions and answers for Lecture: Exploring Marine Habitats
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Exploring Marine Habitats" lecture
+    (1, 0, 2, 'What are some examples of marine habitats?'),
+    (2, 1, 2, 'Which zone of the ocean receives the least amount of sunlight?'),
+    (3, 2, 2, 'What are some human impacts on marine habitats?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 4, 'Coral reefs, kelp forests, deep-sea trenches'),
+    (FALSE, 4, 'Tundra, rainforests, deserts'),
+    (FALSE, 4, 'Mountains, lakes, rivers'),
+
+    -- Answers for the second question
+    (TRUE, 5, 'Abyssal zone'),
+    (FALSE, 5, 'Sunlit zone'),
+    (FALSE, 5, 'Twilight zone'),
+
+    -- Answers for the third question
+    (TRUE, 6, 'Pollution'),
+    (TRUE, 6, 'Overfishing'),
+    (TRUE, 6, 'Climate change');
+
+-- Questions and answers for Lecture: Adaptations of Desert Animals
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Adaptations of Desert Animals" lecture
+    (1, 0, 3, 'What are some physical adaptations of desert animals?'),
+    (2, 1, 3, 'True or false: Desert animals are primarily active during the day?'),
+    (3, 2, 3, 'What conservation challenges do desert ecosystems face?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 7, 'Water storage, efficient kidneys, large ears'),
+    (FALSE, 7, 'Gills, fins, scales'),
+    (FALSE, 7, 'Wings, feathers, beaks'),
+
+    -- Answers for the second question
+    (FALSE, 8, 'True'),
+    (TRUE, 8, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 9, 'Habitat destruction'),
+    (TRUE, 9, 'Climate change'),
+    (TRUE, 9, 'Human encroachment');
+
+-- Questions and answers for Lecture: Life in the Arctic
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Life in the Arctic" lecture
+    (1, 0, 4, 'What are some characteristics of the Arctic ecosystem?'),
+    (2, 1, 4, 'True or false: Arctic animals do not need to adapt to extreme cold?'),
+    (3, 2, 4, 'What is a significant threat to the Arctic ecosystem?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 10, 'Extreme cold, ice caps, polar bears'),
+    (FALSE, 10, 'Deserts, heat, camels'),
+    (FALSE, 10, 'Tropical climate, rainforests, jaguars'),
+
+    -- Answers for the second question
+    (FALSE, 11, 'True'),
+    (TRUE, 11, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 12, 'Melting sea ice'),
+    (FALSE, 12, 'Desertification'),
+    (FALSE, 12, 'Volcanic eruptions');
+
+-- Questions and answers for Lecture: Discovering Rainforest Biodiversity
+INSERT INTO education.question (order_in_lecture, type, lecture_id, content)
+VALUES
+    -- Questions for "Discovering Rainforest Biodiversity" lecture
+    (1, 0, 5, 'What makes rainforests one of the most biodiverse ecosystems?'),
+    (2, 1, 5, 'True or false: Rainforests have low ecological importance?'),
+    (3, 2, 5, 'What are some conservation challenges facing rainforests?');
+
+INSERT INTO education.answer (is_correct, question_id, content)
+VALUES
+    -- Answers for the first question
+    (TRUE, 13, 'High number of species, dense vegetation, complex interactions'),
+    (FALSE, 13, 'Low number of species, sparse vegetation, simple interactions'),
+    (FALSE, 13, 'Moderate number of species, moderate vegetation, moderate interactions'),
+
+    -- Answers for the second question
+    (FALSE, 14, 'True'),
+    (TRUE, 14, 'False'),
+
+    -- Answers for the third question
+    (TRUE, 15, 'Deforestation'),
+    (TRUE, 15, 'Habitat fragmentation'),
+    (TRUE, 15, 'Climate change');
+
+INSERT INTO education.test_execution (finished, points, lecture_id, user_id)
+VALUES
+    (TRUE, 25, 1, 2),
+    (TRUE, 15, 1, 3),
+    (TRUE, 5, 1, 4);
+
 
 -- Finance
-INSERT INTO accountants (id, wage)
+INSERT INTO users.accountants (id, wage)
 VALUES (5, 18.7), (6, 18.7);
 
 INSERT INTO finance.budget_plan (status,  start_date, end_date, name, description, author, last_updated_on_date)
@@ -127,3 +254,59 @@ VALUES
     (8, 'ARCHIVED', 'sustainability workshops', '2022-01-01', '2023-01-01', 'Focuses on organizing workshops, seminars, and training sessions to educate individuals and organizations about sustainability practices, resource conservation, and environmental stewardship.', 'Organization aims to empower participants with practical knowledge and skills to integrate sustainability principles into their personal and professional lives, fostering a culture of sustainability and responsible citizenship.', 1),
     (8, 'ARCHIVED', 'air quality monitoring program', '2022-01-01', '2023-01-01', 'Aims to establish a comprehensive air quality monitoring program to track air pollution levels, identify sources of pollution, and inform policy decisions and public health interventions.', 'Organization seeks to improve air quality, protect public health, and raise awareness about the impacts of air pollution on human health and the environment through data-driven analysis and targeted interventions.', 1),
     (8, 'ARCHIVED', 'green infrastructure development', '2022-01-01', '2023-01-01', 'Focuses on planning, designing, and implementing green infrastructure projects such as urban parks, green roofs, and permeable pavement to enhance ecosystem services, mitigate urban heat island effects, and promote climate resilience.', 'Organization aims to create sustainable and resilient communities by integrating green infrastructure into urban planning and development processes, enhancing quality of life and environmental sustainability.', 1);
+
+-- Projects
+INSERT INTO projects.projects (name, description, duration_months, budget, type, status, manager_id)
+VALUES
+    ('Conservation of Wetlands', 'Protecting and restoring wetland ecosystems', 24, 50000.00, 'INTERNAL', 'DRAFT', 9),
+    ('Reforestation Initiative', 'Planting trees and restoring forest habitats', 18, 30000.00, 'EXTERNAL', 'PENDING', 9),
+    ('Urban Green Spaces Development', 'Creating parks and green areas in urban settings', 12, 25000.00, 'INTERNAL', 'APPROVED', 9),
+    ('River Cleanup Campaign', 'Cleaning up polluted rivers and waterways', 6, 10000.00, 'EXTERNAL', 'ONGOING', 9),
+    ('Biodiversity Monitoring Program', 'Monitoring and preserving local biodiversity', 36, 75000.00, 'INTERNAL', 'REJECTED', 9),
+    ('Sustainable Agriculture Project', 'Promoting eco-friendly farming practices', 24, 60000.00, 'EXTERNAL', 'ARCHIVED', 9),
+    ('Ocean Conservation Initiative', 'Protecting marine life and habitats', 36, 80000.00, 'INTERNAL', 'ONGOING', 9),
+    ('Eco-friendly Transportation Campaign', 'Promoting sustainable transport options', 12, 20000.00, 'EXTERNAL', 'PENDING', 9),
+    ('Wildlife Habitat Restoration', 'Restoring habitats for endangered species', 24, 60000.00, 'INTERNAL', 'ONGOING', 10),
+    ('Green Energy Development Project', 'Promoting renewable energy solutions', 18, 35000.00, 'EXTERNAL', 'APPROVED', 10),
+    ('Community Gardens Initiative', 'Creating communal spaces for sustainable gardening', 9, 15000.00, 'INTERNAL', 'ONGOING', 10),
+    ('Eco-tourism Promotion Program', 'Encouraging responsible tourism practices', 24, 40000.00, 'EXTERNAL', 'PENDING', 10),
+    ('Waste Recycling Campaign', 'Promoting waste reduction and recycling', 6, 10000.00, 'INTERNAL', 'ARCHIVED', 13),
+    ('Green Buildings Certification Project', 'Promoting eco-friendly building standards', 36, 90000.00, 'EXTERNAL', 'APPROVED', 10),
+    ('Climate Change Adaptation Strategy', 'Developing strategies for climate resilience', 24, 70000.00, 'INTERNAL', 'ONGOING', 10);
+
+INSERT INTO projects.documents (document_id, project_id, name, progress, status)
+VALUES
+    (1, 1, 'Conservation Plan', 0.25, 'In Progress - less than halfway'), -- Conservation of Wetlands
+    (1, 2, 'Reforestation Plan', 0.10, 'In Progress - less than halfway'), -- Reforestation Initiative
+    (1, 3, 'Green Spaces Proposal', 0.50, 'Halfway Done'), -- Urban Green Spaces Development
+    (1, 4, 'Cleanup Strategy', 0.75, 'In Progress - more than halfway'), -- River Cleanup Campaign
+    (1, 5, 'Monitoring Protocol', 0.40, 'In Progress - less than halfway'), -- Biodiversity Monitoring Program
+    (1, 6, 'Agriculture Plan', 0.60, 'In Progress - more than halfway'), -- Sustainable Agriculture Project
+    (1, 7, 'Ocean Protection Plan', 0.80, 'In Progress - more than halfway'), -- Ocean Conservation Initiative
+    (1, 8, 'Transportation Proposal', 0.20, 'In Progress - less than halfway'), -- Eco-friendly Transportation Campaign
+    (1, 9, 'Habitat Restoration Plan', 0.70, 'In Progress - more than halfway'), -- Wildlife Habitat Restoration
+    (1, 10, 'Energy Development Plan', 0.30, 'In Progress - less than halfway'), -- Green Energy Development Project
+    (1, 11, 'Gardens Blueprint', 0.90, 'Completed'), -- Community Gardens Initiative
+    (1, 12, 'Tourism Promotion Plan', 0.15, 'In Progress - less than halfway'), -- Eco-tourism Promotion Program
+    (1, 13, 'Recycling Strategy', 1.00, 'Completed'), -- Waste Recycling Campaign
+    (1, 14, 'Green Buildings Plan', 0.45, 'In Progress - less than halfway'), -- Green Buildings Certification Project
+    (1, 15, 'Climate Adaptation Strategy', 0.55, 'In Progress - more than halfway'); -- Climate Change Adaptation Strategy
+
+INSERT INTO projects.document_versions (version, document_id, project_id, file_path, author)
+VALUES
+    (1, 1, 1, '/path/to/document1.pdf', 9), -- Conservation of Wetlands
+    (1, 2, 2, '/path/to/document2.pdf', 9), -- Reforestation Initiative
+    (1, 3, 3, '/path/to/document3.pdf', 9),  -- Urban Green Spaces Development
+    (1, 4, 4, '/path/to/document4.pdf', 9), -- River Cleanup Campaign
+    (1, 5, 5, '/path/to/document5.pdf', 9), -- Biodiversity Monitoring Program
+    (1, 6, 6, '/path/to/document6.pdf', 9), -- Sustainable Agriculture Project
+    (1, 7, 7, '/path/to/document7.pdf', 9), -- Ocean Conservation Initiative
+    (1, 8, 8, '/path/to/document8.pdf', 9), -- Eco-friendly Transportation Campaign
+    (1, 9, 9, '/path/to/document9.pdf', 10), -- Wildlife Habitat Restoration
+    (1, 10, 10, '/path/to/document10.pdf', 10), -- Green Energy Development Project
+    (1, 11, 11, '/path/to/document11.pdf', 10), -- Community Gardens Initiative
+    (1, 12, 12, '/path/to/document12.pdf', 10), -- Eco-tourism Promotion Program
+    (1, 13, 13, '/path/to/document13.pdf', 10), -- Waste Recycling Campaign
+    (1, 14, 14, '/path/to/document14.pdf', 10), -- Green Buildings Certification Project
+    (1, 15, 15, '/path/to/document15.pdf', 10); -- Climate Change Adaptation Strategy
+

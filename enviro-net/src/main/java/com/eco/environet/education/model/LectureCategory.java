@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table
+@Table(name = "lecture_category", schema = "education")
 public class LectureCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,4 @@ public class LectureCategory {
 
     @Column(name = "description", nullable = false)
     private String description;
-
-//    @ManyToMany(mappedBy = "categories")
-//    private Set<Lecture> lectures;
 }

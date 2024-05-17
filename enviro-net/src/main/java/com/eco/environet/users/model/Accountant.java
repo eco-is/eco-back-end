@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Entity
 @NoArgsConstructor
 @Builder(builderMethodName = "accountantBuilder")
-@Table(name="accountants")
+@Table(name="accountants", schema = "users")
 public class Accountant extends User {
 
     @Column(name = "wage", nullable = false)

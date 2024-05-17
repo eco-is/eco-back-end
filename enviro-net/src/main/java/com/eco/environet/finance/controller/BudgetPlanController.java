@@ -67,7 +67,7 @@ public class BudgetPlanController {
                     content = @Content)
     })
     @GetMapping(value="/all-plans")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
     public ResponseEntity<Page<BudgetPlanDto>> getAllBudgetPlans(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
@@ -101,7 +101,7 @@ public class BudgetPlanController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)})
     @GetMapping(value="/get-budget/{id}")
-    @PreAuthorize("hasRole('ACCOUNTANT')")
+    @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
     public ResponseEntity<BudgetPlanDto> getBudgetPlan(@PathVariable Long id){
         var result = service.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(result);

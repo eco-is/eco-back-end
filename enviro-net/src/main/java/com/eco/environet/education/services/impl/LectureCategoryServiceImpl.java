@@ -14,9 +14,8 @@ import java.util.List;
 public class LectureCategoryServiceImpl implements LectureCategoryService {
 
     private final LectureCategoryRepository lectureCategoryRepository;
-    private final Mapper mapper;
     @Override
     public List<LectureCategoryDto> findAll() {
-        return mapper.mapList(lectureCategoryRepository.findAll(), LectureCategoryDto.class);
+        return Mapper.mapList(lectureCategoryRepository.findAll(), LectureCategoryDto.class);
     }
 }
