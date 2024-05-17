@@ -30,6 +30,10 @@ public class OrganizationGoal {
     @Column(name = "priority")
     private int priority;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="status")
+    private OrganizationGoalStatus status;
+
     @Embedded
     @AttributeOverrides({
             @AttributeOverride(name="startDate", column=@Column(name="start_date", nullable = false)),
@@ -40,12 +44,13 @@ public class OrganizationGoal {
     @ManyToOne
     private User creator;
 
-    public OrganizationGoal(Long id, String title, String description, String rationale, int priority, DateRange validPeriod, User user){
+    public OrganizationGoal(Long id, String title, String description, String rationale, int priority, OrganizationGoalStatus status, DateRange validPeriod, User user){
         this.id = id;
         this.title = title;
         this.description = description;
         this.rationale = rationale;
         this.priority = priority;
+        this.status = status;
         this.validPeriod = validPeriod;
         this.creator = user;
     }

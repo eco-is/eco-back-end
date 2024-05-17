@@ -16,6 +16,7 @@ public class OrganizationGoalDto {
     private String description;
     private String rationale;
     private int priority;
+    private String status;
     private DateRange validPeriod;
     private AccountantDto creator;
 }

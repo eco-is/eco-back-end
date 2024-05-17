@@ -1,5 +1,6 @@
 package com.eco.environet.finance.services.impl;
 
+import com.eco.environet.finance.model.OrganizationGoalStatus;
 import com.eco.environet.finance.services.OrganizationGoalService;
 import com.eco.environet.users.model.User;
 import com.eco.environet.finance.dto.OrganizationGoalDto;
@@ -32,13 +33,15 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
     public OrganizationGoalDto create(OrganizationGoalDto newGoal) {
         User creator = new User();
         creator.setId(newGoal.getCreator().getId());
+        DateRange period = new DateRange(newGoal.getValidPeriod().getStartDate(), null);
 
         OrganizationGoal goal = OrganizationGoal.builder()
                 .title(newGoal.getTitle())
                 .description(newGoal.getDescription())
                 .rationale(newGoal.getRationale())
                 .priority(newGoal.getPriority())
-                .validPeriod(newGoal.getValidPeriod())
+                .status(OrganizationGoalStatus.DRAFT)
+                .validPeriod(period)
                 .creator(creator)
                 .build();
         repository.save(goal);
@@ -90,6 +93,9 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
         OrganizationGoal goal = repository.findById(oldGoal.getId())
                 .orElseThrow(() -> new EntityNotFoundException("Organization goal not found with ID: " + oldGoal.getId()));
 
+        if (oldGoal.getStatus().equals("DRAFT")){
+            goal.setTitle(oldGoal.getTitle());
+        }
         goal.setDescription(oldGoal.getDescription());
         goal.setRationale(oldGoal.getRationale());
         goal.setPriority(oldGoal.getPriority());
