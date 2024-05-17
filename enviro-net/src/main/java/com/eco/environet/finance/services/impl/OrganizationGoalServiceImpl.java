@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,6 +76,20 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
                                 .collect(Collectors.toList()))
                         .build())
                 .collect(Collectors.toList());
+
+        // Custom sort: first by status (DRAFT > VALID > ARCHIVED), then by validPeriod.startDate (newest first)
+        goalsSets.sort(Comparator.comparing((OrganizationGoalsSetDto set) -> {
+            switch (OrganizationGoalStatus.valueOf(set.getStatus())) {
+                case DRAFT:
+                    return 1;
+                case VALID:
+                    return 2;
+                case ARCHIVED:
+                    return 3;
+                default:
+                    return 4;
+            }
+        }).thenComparing(set -> set.getValidPeriod().getStartDate(), Comparator.reverseOrder()));
 
         return new PageImpl<>(goalsSets, pageable, allGoals.getTotalElements());
     }
