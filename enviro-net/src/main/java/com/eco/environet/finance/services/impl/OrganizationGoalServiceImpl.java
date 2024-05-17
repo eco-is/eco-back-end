@@ -80,9 +80,20 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
     }
 
     @Override
-    public Page<OrganizationGoalDto> findCurrent(Pageable pageable) {
-        Page<OrganizationGoal> currentGoals = repository.findByValidPeriodEndDateIsNull(pageable);
-        return Mapper.mapPage(currentGoals, OrganizationGoalDto.class);
+    public OrganizationGoalsSetDto findCurrent() {
+        OrganizationGoalsSetDto goalSet = new OrganizationGoalsSetDto();
+        List<OrganizationGoalDto> validGoalsList = new ArrayList<>();
+
+        Page<OrganizationGoal> currentGoals = repository.findByValidPeriodEndDateIsNull(Pageable.unpaged());
+        for (OrganizationGoal goal: currentGoals){
+            AccountantDto creator = new AccountantDto(goal.getCreator().getId(),goal.getCreator().getUsername(),goal.getCreator().getName(),goal.getCreator().getSurname(),goal.getCreator().getEmail());
+            validGoalsList.add(new OrganizationGoalDto(goal.getId(), goal.getTitle(), goal.getDescription(), goal.getRationale(), goal.getPriority(), goal.getStatus().toString(), goal.getValidPeriod(), creator));
+            goalSet.setValidPeriod(goal.getValidPeriod());
+        }
+        goalSet.setStatus("VALID");
+        goalSet.setGoals(validGoalsList);
+
+        return goalSet;
     }
 
     @Override

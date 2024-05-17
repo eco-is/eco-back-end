@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public interface OrganizationGoalService {
     OrganizationGoalDto create(OrganizationGoalDto newGoal);
     Page<OrganizationGoalsSetDto> findAll(Pageable pageable);
-    Page<OrganizationGoalDto> findCurrent(Pageable pageable);
+    OrganizationGoalsSetDto findCurrent();
     OrganizationGoalDto findById(Long id);
     OrganizationGoalDto update(OrganizationGoalDto oldGoal);
     void delete(Long id);

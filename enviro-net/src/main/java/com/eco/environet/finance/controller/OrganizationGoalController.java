@@ -81,9 +81,9 @@ public class OrganizationGoalController {
 
     @Operation(summary = "Get current organization goals")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Fetched all current organization goals!",
+            @ApiResponse(responseCode = "200", description = "Fetched current organization goals set!",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Page.class)) }),
+                            schema = @Schema(implementation = OrganizationGoalsSetDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -96,17 +96,8 @@ public class OrganizationGoalController {
                     content = @Content)
     })
     @GetMapping(value = "/current")
-    @PreAuthorize("hasRole('BOARD_MEMBER')")
-    public ResponseEntity<Page<OrganizationGoalDto>> getAllCurrent(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(name = "sort", required = false, defaultValue = "title") String sortField,
-            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
-    ) {
-        Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-
-        var result = service.findCurrent(pageRequest);
+    public ResponseEntity<OrganizationGoalsSetDto> getAllCurrent() {
+        var result = service.findCurrent();
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
