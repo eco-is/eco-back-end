@@ -10,6 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DocumentVersionId implements Serializable {
+
     Long projectId;
     Long documentId;
     Long version;

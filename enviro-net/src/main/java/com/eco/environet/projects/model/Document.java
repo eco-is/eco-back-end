@@ -1,7 +1,6 @@
 package com.eco.environet.projects.model;
 
 import com.eco.environet.projects.model.id.DocumentId;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 

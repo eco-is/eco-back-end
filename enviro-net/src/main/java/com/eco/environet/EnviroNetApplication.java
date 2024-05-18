@@ -22,7 +22,7 @@ public class EnviroNetApplication {
 	}
 
 	@EventListener({ApplicationReadyEvent.class})
-	void applicationReadyEvent() {
+	public void applicationReadyEvent() {
 		System.out.println("Application started ... launching browser now");
 		browse("http://localhost:8080/swagger-ui/index.html");
 	}
