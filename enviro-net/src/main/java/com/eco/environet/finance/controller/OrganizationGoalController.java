@@ -149,7 +149,7 @@ public class OrganizationGoalController {
 
     @Operation(summary = "Delete organization goal")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Updated organization goal!",
+            @ApiResponse(responseCode = "200", description = "Deleted organization goal!",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = OrganizationGoalDto.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",

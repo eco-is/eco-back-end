@@ -237,6 +237,21 @@ VALUES
     (14, 18.7, 6, 21),
     (15, 18.7, 6, 21.2);
 
+INSERT INTO finance.fixed_expenses (type, expense_type,employee, overtime_hours, start_date, end_date, amount, creator, created_on, description)
+VALUES
+    -- FixedExpenses - January 2024
+    ('SALARY', 'SALARY',  5, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY',  6, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY',  7, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY',  8, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY', 10, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY', 11, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY', 12, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY', 13, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY', 14, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('SALARY', 'SALARY', 15, 0, '2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+    ('RENT', 'FixedExpenses', null, null, '2024-01-01', '2024-02-01', 5000, 5, '2024-02-12 12:00:00.000', 'Rent for January 2024');
+
 INSERT INTO finance.budget_plan (status,  start_date, end_date, name, description, author, last_updated_on_date)
 VALUES
     ('DRAFT', '2024-01-01', '2024-12-31', '2024 Annual Budget', 'Annual Budget Plan', 5, '2024-04-04'),
