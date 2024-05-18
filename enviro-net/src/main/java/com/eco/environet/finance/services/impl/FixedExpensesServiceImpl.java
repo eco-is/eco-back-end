@@ -157,7 +157,34 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         return Mapper.map(expense, FixedExpensesDto.class);
     }
 
-    // TODO - salary update
+    @Override
+    public FixedExpensesDto updateSalaryExpense(FixedExpensesDto salaryExpenseDto){
+        if (!salaryExpenseDto.getType().equals("SALARY")){
+            throw new IllegalArgumentException("Invalid type provided! Type must be SALARY!");
+        }
+        if (salaryExpenseDto.getEmployee() == null){
+            throw new IllegalArgumentException("Employee can't be null!");
+        }
+        // update employee - OrganizationMember info: wage, workingHours, overtimeWage
+        OrganizationMember employee = organizationMemberRepository.findById(salaryExpenseDto.getEmployee().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Employee not found with ID: " + salaryExpenseDto.getEmployee().getId()));
+        employee.setWage(salaryExpenseDto.getEmployee().getWage());
+        employee.setWorkingHours(salaryExpenseDto.getEmployee().getWorkingHours());
+        employee.setOvertimeWage(salaryExpenseDto.getEmployee().getOvertimeWage());
+        organizationMemberRepository.save(employee);
+
+        // update salary
+        Salary salary = salaryRepository.findById(salaryExpenseDto.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Salary expense not found with ID: " + salaryExpenseDto.getId()));
+        Salary newSalary = new Salary(salary, employee, salaryExpenseDto.getOvertimeHours());
+        newSalary.setDescription(salaryExpenseDto.getDescription());
+        salaryRepository.save(newSalary);
+
+        var creatorDto = new AccountantDto(newSalary.getCreator().getId(), newSalary.getCreator().getUsername(), newSalary.getCreator().getName(), newSalary.getCreator().getSurname(), newSalary.getCreator().getEmail());
+        var employeeDto = new EmployeeDto(newSalary.getEmployee().getId(), newSalary.getEmployee().getUsername(), newSalary.getEmployee().getName(), newSalary.getEmployee().getSurname(), newSalary.getEmployee().getEmail(), newSalary.getEmployee().getWage(), newSalary.getEmployee().getWorkingHours(), newSalary.getEmployee().getOvertimeWage());
+        return new FixedExpensesDto(newSalary.getId(), newSalary.getType().toString(), newSalary.getPeriod(), newSalary.getAmount(), creatorDto, newSalary.getCreatedOn(), newSalary.getDescription(), employeeDto, newSalary.getOvertimeHours());
+    }
+
     @Override
     public FixedExpensesDto update(FixedExpensesDto fixedExpenseDto){
         FixedExpenses updatedExpense = repository.findById(fixedExpenseDto.getId())

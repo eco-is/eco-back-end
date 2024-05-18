@@ -33,6 +33,12 @@ public class Salary extends FixedExpenses {
         this.overtimeHours = overtimeHours;
         this.setAmount(calculateAmount()); // Calculate amount
     }
+    public Salary(Salary salary, OrganizationMember employee, double overtimeHours){
+        super(salary.getId(), salary.getType(), salary.getPeriod(), salary.getAmount(), salary.getCreator(), salary.getCreatedOn(), salary.getDescription());
+        this.employee = employee;
+        this.overtimeHours = overtimeHours;
+        this.setAmount(calculateAmount()); // Calculate amount
+    }
 
     // Method to calculate amount
     private double calculateAmount() {

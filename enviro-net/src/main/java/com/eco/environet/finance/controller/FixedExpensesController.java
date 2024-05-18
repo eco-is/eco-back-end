@@ -106,6 +106,28 @@ public class FixedExpensesController {
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
+    @Operation(summary = "Accountant updates salary expense")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Salary expense updated!",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = FixedExpensesDto.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)
+    })
+    @PutMapping(value = "/update/salary")
+    @PreAuthorize("hasRole('ACCOUNTANT')")
+    public ResponseEntity<FixedExpensesDto> updateSalaryExpense(@RequestBody FixedExpensesDto fixedExpensesDto) {
+        var result = service.updateSalaryExpense(fixedExpensesDto);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
     @Operation(summary = "Accountant updates fixed expense")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fixed expense updated!",
@@ -125,13 +147,6 @@ public class FixedExpensesController {
     @PutMapping(value = "/update")
     @PreAuthorize("hasRole('ACCOUNTANT')")
     public ResponseEntity<FixedExpensesDto> updateFixedExpense(@RequestBody FixedExpensesDto fixedExpensesDto) {
-        // Check if authenticated user matches the author of fixed explense
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        if (!currentUsername.equals(fixedExpensesDto.getCreator().getUsername())){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         var result = service.update(fixedExpensesDto);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
@@ -153,7 +168,7 @@ public class FixedExpensesController {
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ACCOUNTANT')")
     public ResponseEntity<Void> deleteFixedExpense(@PathVariable Long id, @RequestBody FixedExpensesDto fixedExpenseDto) {
-        // Check if authenticated user matches the author of fixed explense
+        // Check if authenticated user matches the author of fixed expense
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUsername = authentication.getName();
         if (!currentUsername.equals(fixedExpenseDto.getCreator().getUsername())){

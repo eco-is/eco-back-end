@@ -12,6 +12,7 @@ public interface FixedExpensesService {
     ////filters: type, periods, employees,
     //Page<FixedExpensesDto> findAll(List<String> types, Pageable pageable);
     FixedExpensesDto findById(Long id);
+    FixedExpensesDto updateSalaryExpense(FixedExpensesDto salaryExpenseDto);
     FixedExpensesDto update(FixedExpensesDto fixedExpenseDto);
     void delete(Long id);
 }
