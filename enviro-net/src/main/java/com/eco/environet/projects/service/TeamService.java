@@ -11,6 +11,6 @@ public interface TeamService {
     List<TeamMemberDto> findAvailableMembers(Long projectId);
     List<TeamMemberDto> findTeamMembers(Long projectId);
     void addTeamMember(TeamMemberCreationDto teamMemberDto);
-    void removeTeamMember(Long memberId);
+    void removeTeamMember(Long projectId, Long userId);
     DocumentDto assignTeamMembers(Long projectId, AssignmentDto assignmentDto);
 }

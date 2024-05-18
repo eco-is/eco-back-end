@@ -69,10 +69,10 @@ public class TeamController {
             @ApiResponse(responseCode = "200", description = "Removed team member", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "text/plain"))
     })
-    @DeleteMapping("/{memberId}")
+    @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('PROJECT_MANAGER')")
-    public ResponseEntity<Void> removeTeamMember(@PathVariable Long memberId) {
-        teamService.removeTeamMember(memberId);
+    public ResponseEntity<Void> removeTeamMember(@PathVariable Long projectId, @PathVariable Long userId) {
+        teamService.removeTeamMember(projectId, userId);
         return ResponseEntity.ok().build();
     }
 

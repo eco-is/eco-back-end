@@ -5,6 +5,7 @@ import com.eco.environet.projects.dto.DocumentDto;
 import com.eco.environet.projects.dto.TeamMemberCreationDto;
 import com.eco.environet.projects.dto.TeamMemberDto;
 import com.eco.environet.projects.model.*;
+import com.eco.environet.projects.model.id.TeamMemberId;
 import com.eco.environet.projects.repository.AssignmentRepository;
 import com.eco.environet.projects.repository.DocumentRepository;
 import com.eco.environet.projects.repository.ProjectRepository;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,19 +36,20 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<TeamMemberDto> findAvailableMembers(Long projectId) {
-        List<User> availableMembers = filterTeamMembers(projectId);
+        List<Long> availableMemberIds = filterTeamMembers(projectId);
+        List<TeamMemberDto> availableMembers = new ArrayList<>();
 
-        return availableMembers.stream()
-                .map(user -> {
-                    TeamMemberDto dto = new TeamMemberDto();
-                    dto.setUserId(user.getId());
-                    dto.setFirstName(user.getName());
-                    dto.setLastName(user.getSurname());
-                    dto.setEmail(user.getEmail());
-                    dto.setRole(user.getRole().toString());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        for (User user : userRepository.findAllById(availableMemberIds)) {
+            TeamMemberDto memberDto = new TeamMemberDto();
+            memberDto.setUserId(user.getId());
+            memberDto.setFirstName(user.getName());
+            memberDto.setLastName(user.getSurname());
+            memberDto.setEmail(user.getEmail());
+            memberDto.setRole(user.getRole().toString());
+
+            availableMembers.add(memberDto);
+        }
+        return availableMembers;
     }
 
     @Override
@@ -64,15 +67,16 @@ public class TeamServiceImpl implements TeamService {
         Long userId = teamMemberCreationDto.getUserId();
         userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Organization Member not found"));
 
-        teamMemberRepository.save(TeamMember.initalizeTeamMember(projectId, userId));
+        TeamMember teamMember = new TeamMember();
+        teamMember.setProjectId(projectId);
+        teamMember.setUserId(userId);
+
+        teamMemberRepository.save(teamMember);
     }
 
     @Override
-    public void removeTeamMember(Long memberId) {
-        TeamMember teamMember = teamMemberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Team Member not found"));
-
-        teamMemberRepository.delete(teamMember);
+    public void removeTeamMember(Long projectId, Long userId) {
+        teamMemberRepository.deleteById(new TeamMemberId(projectId, userId));
     }
 
     @Override
@@ -80,8 +84,8 @@ public class TeamServiceImpl implements TeamService {
         Document document = documentRepository.findByDocumentIdAndProjectId(assignmentDto.getDocumentId(), projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Document not found"));
 
-        List<TeamMember> writers = teamMemberRepository.findAllById(assignmentDto.getWriterIds());
-        List<TeamMember> reviewers = teamMemberRepository.findAllById(assignmentDto.getReviewerIds());
+        List<TeamMember> writers = teamMemberRepository.findAllByProjectIdAndUserIdIn(projectId, assignmentDto.getWriterIds().stream().toList());
+        List<TeamMember> reviewers = teamMemberRepository.findAllByProjectIdAndUserIdIn(projectId, assignmentDto.getReviewerIds().stream().toList());
         validateTeamMembers(reviewers, writers, projectId);
 
         assign(document, writers, reviewers);
@@ -98,11 +102,11 @@ public class TeamServiceImpl implements TeamService {
                 document.getDocumentId(), document.getProjectId());
 
         List<Assignment> writerAssignments = writers.stream()
-                .map(writer -> createAssignment(document, writer, Task.WRITE))
+                .map(writer -> Assignment.createAssignment(document, writer, Task.WRITE))
                 .toList();
 
         List<Assignment> reviewerAssignments = reviewers.stream()
-                .map(reviewer -> createAssignment(document, reviewer, Task.REVIEW))
+                .map(reviewer -> Assignment.createAssignment(document, reviewer, Task.REVIEW))
                 .toList();
 
         assignmentRepository.deleteAll(currentAssignments);
@@ -110,28 +114,34 @@ public class TeamServiceImpl implements TeamService {
         assignmentRepository.saveAll(writerAssignments);
     }
 
-    private List<User> filterTeamMembers(Long projectId) {
-        List<User> organizationMembers = userRepository.findAllOrganizationMembers();
-        List<TeamMember> teamMembers = teamMemberRepository.findByProjectId(projectId);
-
-        List<User> teamUsers = teamMembers.stream()
-                .map(TeamMember::getUser)
+    private List<Long> filterTeamMembers(Long projectId) {
+        List<Long> organizationMemberIds = userRepository.findAllOrganizationMembers().stream()
+                .map(User::getId)
                 .toList();
 
-        return organizationMembers.stream()
-                .filter(user -> !teamUsers.contains(user))
+        List<TeamMember> teamMembers = teamMemberRepository.findByProjectId(projectId);
+
+        List<Long> teamMemberIds = teamMembers.stream()
+                .map(TeamMember::getUserId)
+                .toList();
+
+        return organizationMemberIds.stream()
+                .filter(userId -> !teamMemberIds.contains(userId))
                 .toList();
     }
 
+
     private TeamMemberDto createTeamMemberDto(TeamMember teamMember) {
+        User user = userRepository.findById(teamMember.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
         TeamMemberDto teamMemberDto = new TeamMemberDto();
-        teamMemberDto.setId(teamMember.getId());
-        teamMemberDto.setProjectId(teamMember.getProject().getId());
-        teamMemberDto.setUserId(teamMember.getUser().getId());
-        teamMemberDto.setFirstName(teamMember.getUser().getName());
-        teamMemberDto.setLastName(teamMember.getUser().getSurname());
-        teamMemberDto.setEmail(teamMember.getUser().getEmail());
-        teamMemberDto.setRole(teamMember.getUser().getRole().toString());
+        teamMemberDto.setProjectId(teamMember.getProjectId());
+        teamMemberDto.setUserId(user.getId());
+        teamMemberDto.setFirstName(user.getName());
+        teamMemberDto.setLastName(user.getSurname());
+        teamMemberDto.setEmail(user.getEmail());
+        teamMemberDto.setRole(user.getRole().toString());
 
         return teamMemberDto;
     }
@@ -141,23 +151,15 @@ public class TeamServiceImpl implements TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         reviewers.forEach(reviewer -> {
-            if (!reviewer.getProject().equals(project)) {
+            if (!reviewer.getProjectId().equals(project.getId())) {
                 throw new IllegalArgumentException("Reviewer is not part of the project team");
             }
         });
 
         writers.forEach(writer -> {
-            if (!writer.getProject().equals(project)) {
+            if (!writer.getProjectId().equals(project.getId())) {
                 throw new IllegalArgumentException("Writer is not part of the project team");
             }
         });
-    }
-
-    private Assignment createAssignment(Document document, TeamMember teamMember, Task task) {
-        Assignment assignment = new Assignment();
-        assignment.setDocument(document);
-        assignment.setTeamMember(teamMember);
-        assignment.setTask(task);
-        return assignment;
     }
 }

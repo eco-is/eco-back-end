@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 public class TeamMemberDto {
 
-    private Long id;
     private Long projectId;
     private Long userId;
     private String firstName;
