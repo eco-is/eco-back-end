@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface FixedExpensesService {
+    Page<FixedExpensesDto> lastMonthSalaryExpenses(Long creatorId, Pageable pageable);
     FixedExpensesDto create(FixedExpensesDto newFixedExpenseDto);
     ////filters: type, periods, employees,
     //Page<FixedExpensesDto> findAll(List<String> types, Pageable pageable);

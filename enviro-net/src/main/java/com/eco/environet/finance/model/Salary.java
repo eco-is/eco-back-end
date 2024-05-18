@@ -1,13 +1,13 @@
 package com.eco.environet.finance.model;
 
 import com.eco.environet.users.model.OrganizationMember;
-import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Data
 @Entity
@@ -42,6 +42,6 @@ public class Salary extends FixedExpenses {
             double overtimePayment = employee.getOvertimeWage() * overtimeHours;
             amount = regularPayment + overtimePayment;
         }
-        return amount;
+        return new BigDecimal(amount).setScale(4, RoundingMode.HALF_UP).doubleValue();
     }
 }

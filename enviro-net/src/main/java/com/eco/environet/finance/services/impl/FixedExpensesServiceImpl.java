@@ -1,5 +1,6 @@
 package com.eco.environet.finance.services.impl;
 
+import com.eco.environet.finance.dto.AccountantDto;
 import com.eco.environet.finance.dto.EmployeeDto;
 import com.eco.environet.finance.dto.FixedExpensesDto;
 import com.eco.environet.finance.model.DateRange;
@@ -11,17 +12,21 @@ import com.eco.environet.finance.repository.SalaryRepository;
 import com.eco.environet.finance.services.FixedExpensesService;
 import com.eco.environet.users.model.Accountant;
 import com.eco.environet.users.model.OrganizationMember;
-import com.eco.environet.users.model.User;
+import com.eco.environet.users.model.Role;
+import com.eco.environet.users.repository.OrganizationMemberRepository;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -31,24 +36,100 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
     private String baseFrontUrl;
     private final FixedExpensesRepository repository;
     private final SalaryRepository salaryRepository;
+    private final OrganizationMemberRepository organizationMemberRepository;
 
+    @Override
+    public Page<FixedExpensesDto> lastMonthSalaryExpenses(Long creatorId, Pageable pageable) {
+        LocalDate endDate = LocalDate.now().withDayOfMonth(1);
+        LocalDate startDate = endDate.minusMonths(1);
+        DateRange period = new DateRange(startDate, endDate);
+
+        // Check if salary expenses already exist for the period
+        List<Salary> existingExpenses = salaryRepository.findByPeriod(startDate, endDate);
+        if (!existingExpenses.isEmpty()) {
+            List<FixedExpensesDto> existingDtos = new ArrayList<>();
+            for (Salary expense : existingExpenses) {
+                AccountantDto creatorDto = new AccountantDto();
+                creatorDto.setId(expense.getCreator().getId());
+                FixedExpensesDto dto = new FixedExpensesDto(
+                        expense.getId(), expense.getType().toString(), expense.getPeriod(), expense.getAmount(), creatorDto, expense.getCreatedOn(), expense.getDescription(), null, expense.getOvertimeHours());
+                // TODO - fix bug
+                // doesn't fetch first employee, the others are fetched correctly ???
+                if (expense.getEmployee() != null){
+                    dto.setEmployee(new EmployeeDto(expense.getEmployee().getId(), expense.getEmployee().getUsername(), expense.getEmployee().getName(), expense.getEmployee().getSurname(), expense.getEmployee().getEmail(), expense.getEmployee().getWage(), expense.getEmployee().getWorkingHours(), expense.getEmployee().getOvertimeWage()));
+                }
+                existingDtos.add(dto);
+            }
+            return paginate(existingDtos, pageable);
+        }
+
+        // Create new salary for every active employee for last month
+        OrganizationMember creatorMember = organizationMemberRepository.findById(creatorId)
+                .orElseThrow(() -> new EntityNotFoundException("Creator not found with ID: " + creatorId));
+        if (!creatorMember.getRole().equals(Role.ACCOUNTANT)){
+            throw new IllegalArgumentException("Invalid creator provided: " + creatorMember);
+        }
+        Accountant creator = new Accountant();
+        creator.setId(creatorId);
+
+        List<OrganizationMember> employees = organizationMemberRepository.findAllActiveOrganizationMembers();
+        List<FixedExpensesDto> result = new ArrayList<>();
+        for (OrganizationMember employee : employees){
+            var newSalary = createSalaryForEmployee(period, creator, employee);
+            result.add(newSalary);
+        }
+        return paginate(result, pageable);
+    }
+    private FixedExpensesDto createSalaryForEmployee(DateRange period, Accountant creator, OrganizationMember employee){
+        FixedExpenses newExpense = FixedExpenses.fixedExpensesBuilder()
+                .type(FixedExpensesType.SALARY)
+                .period(period)
+                .amount(0)
+                .creator(creator)
+                .createdOn(new Timestamp(System.currentTimeMillis()))
+                .description(employee.getName() + " " + employee.getSurname() + " - Salary for period " + period.getStartDate().toString() + " to " + period.getStartDate().toString())
+                .build();
+        Salary newSalary = new Salary(newExpense, employee, 0);
+        salaryRepository.save(newSalary);
+        newExpense.setId(newSalary.getId());
+        var dto = Mapper.map(newExpense, FixedExpensesDto.class);
+        dto.setEmployee(new EmployeeDto(employee.getId(), employee.getUsername(), employee.getName(), employee.getSurname(), employee.getEmail(), employee.getWage(), employee.getWorkingHours(), employee.getOvertimeWage()));
+        return dto;
+    }
+    private Page<FixedExpensesDto> paginate(List<FixedExpensesDto> result, Pageable pageable){
+        // Implement pagination
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<FixedExpensesDto> pagedResult;
+
+        if (result.size() < startItem) {
+            pagedResult = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, result.size());
+            pagedResult = result.subList(startItem, toIndex);
+        }
+        return new PageImpl<>(pagedResult, pageable, result.size());
+    }
 
     @Override
     public FixedExpensesDto create(FixedExpensesDto newFixedExpenseDto){
-        Accountant creator = new Accountant();
-        creator.setId(newFixedExpenseDto.getCreator().getId());
-
-        // TODO - check if it already exists for last month
         // Determine the period for the last month
         LocalDate endDate = LocalDate.now().withDayOfMonth(1);
         LocalDate startDate = endDate.minusMonths(1);
         DateRange period = new DateRange(startDate, endDate);
+
+        Accountant creator = new Accountant();
+        creator.setId(newFixedExpenseDto.getCreator().getId());
 
         FixedExpensesType fixedExpensesType;
         try {
             fixedExpensesType = FixedExpensesType.valueOf(newFixedExpenseDto.getType());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid type provided: " + newFixedExpenseDto.getType());
+        }
+        if (fixedExpensesType == FixedExpensesType.SALARY){
+            throw new IllegalArgumentException("Invalid type provided! Type can't be SALARY!");
         }
 
         FixedExpenses newExpense = FixedExpenses.fixedExpensesBuilder()
@@ -59,31 +140,8 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
                 .createdOn(new Timestamp(System.currentTimeMillis()))
                 .description(newFixedExpenseDto.getDescription())
                 .build();
-
-        if (fixedExpensesType == FixedExpensesType.SALARY && newFixedExpenseDto.getEmployee() == null){
-            throw new IllegalArgumentException("Invalid employee for salary provided! Employee can't be null for salary!");
-        } else {
-            if (fixedExpensesType == FixedExpensesType.SALARY) {
-                User employeeUser = new User();
-                employeeUser.setId(newFixedExpenseDto.getEmployee().getId());
-                employeeUser.setEmail(newFixedExpenseDto.getEmployee().getEmail());
-
-                // Salary
-                OrganizationMember employee = new OrganizationMember(
-                        employeeUser,
-                        newFixedExpenseDto.getEmployee().getWage(),
-                        newFixedExpenseDto.getEmployee().getWorkingHours(),
-                        newFixedExpenseDto.getEmployee().getOvertimeWage());
-                Salary newSalary = new Salary(newExpense, employee, newFixedExpenseDto.getOvertimeHours());
-                salaryRepository.save(newSalary);
-                newExpense.setId(newSalary.getId());
-                // TODO employee is null when returned
-                return Mapper.map(newExpense, FixedExpensesDto.class);
-            } else {
-                repository.save(newExpense);
-                return Mapper.map(newExpense, FixedExpensesDto.class);
-            }
-        }
+        repository.save(newExpense);
+        return Mapper.map(newExpense, FixedExpensesDto.class);
     }
 
     // TODO
@@ -99,6 +157,7 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         return Mapper.map(expense, FixedExpensesDto.class);
     }
 
+    // TODO - salary update
     @Override
     public FixedExpensesDto update(FixedExpensesDto fixedExpenseDto){
         FixedExpenses updatedExpense = repository.findById(fixedExpenseDto.getId())
