@@ -310,3 +310,4 @@ VALUES
     (1, 14, 14, '/path/to/document14.pdf', 10), -- Green Buildings Certification Project
     (1, 15, 15, '/path/to/document15.pdf', 10); -- Climate Change Adaptation Strategy
 
+-- TODO add assignments, team members, reviews

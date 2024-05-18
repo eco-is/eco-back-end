@@ -4,6 +4,7 @@ import com.eco.environet.projects.dto.*;
 import com.eco.environet.projects.model.*;
 import com.eco.environet.projects.repository.*;
 import com.eco.environet.projects.service.ProjectService;
+import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -25,6 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final DocumentRepository documentRepository;
     private final AssignmentRepository assignmentRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Page<ProjectDto> findAllProjects(String name, Pageable pageable) {
@@ -55,11 +57,12 @@ public class ProjectServiceImpl implements ProjectService {
             List<TeamMemberDto> reviewers = new ArrayList<>();
 
             for (Assignment assignment : assignments) {
-                TeamMember teamMember = assignment.getTeamMember();
+                User user = userRepository.findById(assignment.getUserId())
+                        .orElseThrow(() -> new EntityNotFoundException("User not found"));
                 TeamMemberDto teamMemberDto = new TeamMemberDto();
-                teamMemberDto.setId(teamMember.getId());
-                teamMemberDto.setFirstName(teamMember.getUser().getName());
-                teamMemberDto.setLastName(teamMember.getUser().getSurname());
+                teamMemberDto.setUserId(user.getId());
+                teamMemberDto.setFirstName(user.getName());
+                teamMemberDto.setLastName(user.getSurname());
 
                 if (assignment.getTask() == Task.WRITE) {
                     writers.add(teamMemberDto);

@@ -9,9 +9,9 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentVersionId implements Serializable {
+public class AssignmentId implements Serializable {
 
     Long projectId;
     Long documentId;
-    Long version;
+    Long userId;
 }

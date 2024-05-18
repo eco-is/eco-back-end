@@ -1,31 +1,42 @@
 package com.eco.environet.projects.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.eco.environet.projects.model.id.AssignmentId;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
+@IdClass(AssignmentId.class)
 @Table(name = "assignments", schema = "projects")
 public class Assignment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
+    @Column(name = "document_id", nullable = false)
+    private Long documentId;
 
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "document_id", referencedColumnName = "document_id"),
-            @JoinColumn(name = "project_id", referencedColumnName = "project_id")
-    })
-    private Document document;
+    @Id
+    @Column(name = "project_id", nullable = false)
+    private Long projectId;
 
-    @ManyToOne
-    @JoinColumn(name = "team_member_id", referencedColumnName = "id")
-    private TeamMember teamMember;
+    @Id
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Task task;
+
+    public static Assignment createAssignment(Document document, TeamMember teamMember, Task task) {
+        if (!document.getProjectId().equals(teamMember.getProjectId())) {
+            throw new IllegalArgumentException("Document and Team Member do not belong to the same project");
+        }
+
+        Assignment assignment = new Assignment();
+        assignment.setDocumentId(document.getDocumentId());
+        assignment.setProjectId(document.getProjectId());
+        assignment.setUserId(teamMember.getUserId());
+        assignment.setTask(task);
+
+        return assignment;
+    }
 }
