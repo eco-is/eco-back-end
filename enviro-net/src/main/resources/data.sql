@@ -220,8 +220,22 @@ VALUES
 
 
 -- Finance
-INSERT INTO users.accountants (id, wage)
-VALUES (5, 18.7), (6, 18.7);
+INSERT INTO users.accountants (id, wage, working_hours, overtime_wage)
+VALUES (5, 18.7, 7, 20),
+       (6, 18.7, 7, 20);
+INSERT INTO users.organization_members (id, wage, working_hours, overtime_wage)
+VALUES
+    (5, 18.7, 7, 20),
+    (6, 18.7, 7, 20),
+    (7, 19, 7, 20.5),
+    (8, 19, 7, 20.5),
+    (9, 19, 7, 20.5),
+    (10, 18.7, 8, 20),
+    (11, 18.7, 8, 20),
+    (12, 18.7, 8, 20),
+    (13, 18.7, 8, 20),
+    (14, 18.7, 6, 21),
+    (15, 18.7, 6, 21.2);
 
 INSERT INTO finance.budget_plan (status,  start_date, end_date, name, description, author, last_updated_on_date)
 VALUES
