@@ -46,10 +46,10 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         DateRange period = new DateRange(startDate, endDate);
 
         // Check if salary expenses already exist for the period
-        List<Salary> existingExpenses = salaryRepository.findByPeriod(startDate, endDate);
-        if (!existingExpenses.isEmpty()) {
+        List<Salary> existingSalaryExpenses = salaryRepository.findByPeriod(startDate, endDate);
+        if (!existingSalaryExpenses.isEmpty()) {
             List<FixedExpensesDto> existingDtos = new ArrayList<>();
-            for (Salary expense : existingExpenses) {
+            for (Salary expense : existingSalaryExpenses) {
                 EmployeeDto creatorDto = new EmployeeDto();
                 creatorDto.setId(expense.getCreator().getId());
                 FixedExpensesDto dto = new FixedExpensesDto(
@@ -61,6 +61,15 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
                 }
                 existingDtos.add(dto);
             }
+            // fetch other non salary expenses
+            List<FixedExpenses> existingFixedExpenses = repository.findNonSalaryByPeriod(startDate, endDate);
+            if (!existingFixedExpenses.isEmpty()){
+                for (FixedExpenses expense : existingFixedExpenses){
+                    FixedExpensesDto dto = Mapper.map(expense, FixedExpensesDto.class);
+                    existingDtos.add(dto);
+                }
+            }
+
             return paginate(existingDtos, pageable);
         }
 

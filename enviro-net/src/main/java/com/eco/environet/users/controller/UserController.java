@@ -132,7 +132,7 @@ public class UserController {
                     content = @Content)
     })
     @GetMapping(value="/members")
-    @PreAuthorize("hasRole('ADMINISTRATOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'BOARD_MEMBER', 'ACCOUNTANT')")
     public ResponseEntity<Page<UserDto>> getAllOrganizationMembers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,

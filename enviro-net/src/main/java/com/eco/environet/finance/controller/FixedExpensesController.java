@@ -51,7 +51,7 @@ public class FixedExpensesController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(name = "sort", required = false, defaultValue = "period.startDate") String sortField,
             @RequestParam(name = "direction", required = false, defaultValue = "desc") String sortDirection,
-            @RequestParam Long creatorId
+            @RequestParam(name = "creatorId", required = true) Long creatorId
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
