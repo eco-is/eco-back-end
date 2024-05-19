@@ -9,7 +9,7 @@ import java.util.List;
 public interface FixedExpensesService {
     Page<FixedExpensesDto> lastMonthSalaryExpenses(Long creatorId, Pageable pageable);
     FixedExpensesDto create(FixedExpensesDto newFixedExpenseDto);
-    Page<FixedExpensesDto> findAll(Long creatorId, List<String> types, Pageable pageable);
+    Page<FixedExpensesDto> findAll(List<String> types, List<Long> employees, List<Long> creators, Pageable pageable);
     FixedExpensesDto findById(Long id);
     FixedExpensesDto updateSalaryExpense(FixedExpensesDto salaryExpenseDto);
     FixedExpensesDto update(FixedExpensesDto fixedExpenseDto);

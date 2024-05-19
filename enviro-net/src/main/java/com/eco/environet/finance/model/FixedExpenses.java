@@ -1,6 +1,6 @@
 package com.eco.environet.finance.model;
 
-import com.eco.environet.users.model.Accountant;
+import com.eco.environet.users.model.OrganizationMember;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@DiscriminatorColumn(name = "type")
 @DiscriminatorColumn(name = "expense_type")
 @Builder(builderMethodName = "fixedExpensesBuilder")
 @Table(name="fixed_expenses", schema = "finance")
@@ -40,7 +39,7 @@ public class FixedExpenses {
     private double amount = 0;
 
     @ManyToOne
-    private Accountant creator;
+    private OrganizationMember creator;
 
     @Column(name = "created_on", nullable = false)
     private Timestamp createdOn = Timestamp.from(Instant.now());

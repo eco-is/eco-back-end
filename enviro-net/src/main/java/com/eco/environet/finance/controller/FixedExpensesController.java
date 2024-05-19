@@ -28,9 +28,9 @@ import java.util.List;
 public class FixedExpensesController {
     private final FixedExpensesService service;
 
-    @Operation(summary = "Create new Salary Expenses")
+    @Operation(summary = "Generate last month Salary Expenses or display if already exists")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "New Salary Expenses created!",
+            @ApiResponse(responseCode = "200", description = "Last month  Expenses fetched!",
                     content = { @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Page.class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
@@ -44,9 +44,9 @@ public class FixedExpensesController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)
     })
-    @GetMapping(value = "/create/salary")
+    @GetMapping(value = "/salary")
     @PreAuthorize("hasRole('ACCOUNTANT')")
-    public ResponseEntity<Page<FixedExpensesDto>> createNewSalaryExpenses(
+    public ResponseEntity<Page<FixedExpensesDto>> lastMonthSalaryExpenses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(name = "sort", required = false, defaultValue = "period.startDate") String sortField,
@@ -104,15 +104,17 @@ public class FixedExpensesController {
     public ResponseEntity<Page<FixedExpensesDto>> getAllFixedExpenses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
+            // TODO period filter
             @RequestParam(name = "types", required = false) List<String> types,
-            // TODO filters
+            @RequestParam(name = "employees", required = false) List<Long> employees,
+            @RequestParam(name = "creators", required = false) List<Long> creators,
             @RequestParam(name = "sort", required = false, defaultValue = "type") String sortField,
             @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(null, types, pageRequest);
+        var result = service.findAll(types, employees, creators, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -131,7 +133,7 @@ public class FixedExpensesController {
                     content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)})
-    @GetMapping(value="/get-expense/{id}")
+    @GetMapping(value="/get/{id}")
     @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
     public ResponseEntity<FixedExpensesDto> getFixedExpense(@PathVariable Long id){
         var result = service.findById(id);

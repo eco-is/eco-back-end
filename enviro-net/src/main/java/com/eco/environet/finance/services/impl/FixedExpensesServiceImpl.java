@@ -1,6 +1,5 @@
 package com.eco.environet.finance.services.impl;
 
-import com.eco.environet.finance.dto.AccountantDto;
 import com.eco.environet.finance.dto.EmployeeDto;
 import com.eco.environet.finance.dto.FixedExpensesDto;
 import com.eco.environet.finance.model.DateRange;
@@ -11,7 +10,6 @@ import com.eco.environet.finance.repository.FixedExpensesRepository;
 import com.eco.environet.finance.repository.FixedExpensesSpecifications;
 import com.eco.environet.finance.repository.SalaryRepository;
 import com.eco.environet.finance.services.FixedExpensesService;
-import com.eco.environet.users.model.Accountant;
 import com.eco.environet.users.model.OrganizationMember;
 import com.eco.environet.users.model.Role;
 import com.eco.environet.users.repository.OrganizationMemberRepository;
@@ -52,7 +50,7 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         if (!existingExpenses.isEmpty()) {
             List<FixedExpensesDto> existingDtos = new ArrayList<>();
             for (Salary expense : existingExpenses) {
-                AccountantDto creatorDto = new AccountantDto();
+                EmployeeDto creatorDto = new EmployeeDto();
                 creatorDto.setId(expense.getCreator().getId());
                 FixedExpensesDto dto = new FixedExpensesDto(
                         expense.getId(), expense.getType().toString(), expense.getPeriod(), expense.getAmount(), creatorDto, expense.getCreatedOn(), expense.getDescription(), null, expense.getOvertimeHours());
@@ -72,7 +70,7 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         if (!creatorMember.getRole().equals(Role.ACCOUNTANT)){
             throw new IllegalArgumentException("Invalid creator provided: " + creatorMember);
         }
-        Accountant creator = new Accountant();
+        OrganizationMember creator = new OrganizationMember();
         creator.setId(creatorId);
 
         List<OrganizationMember> employees = organizationMemberRepository.findAllActiveOrganizationMembers();
@@ -83,7 +81,7 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         }
         return paginate(result, pageable);
     }
-    private FixedExpensesDto createSalaryForEmployee(DateRange period, Accountant creator, OrganizationMember employee){
+    private FixedExpensesDto createSalaryForEmployee(DateRange period, OrganizationMember creator, OrganizationMember employee){
         FixedExpenses newExpense = FixedExpenses.fixedExpensesBuilder()
                 .type(FixedExpensesType.SALARY)
                 .period(period)
@@ -122,7 +120,7 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         LocalDate startDate = endDate.minusMonths(1);
         DateRange period = new DateRange(startDate, endDate);
 
-        Accountant creator = new Accountant();
+        OrganizationMember creator = new OrganizationMember();
         creator.setId(newFixedExpenseDto.getCreator().getId());
 
         FixedExpensesType fixedExpensesType;
@@ -147,19 +145,27 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         return Mapper.map(newExpense, FixedExpensesDto.class);
     }
 
-    // TODO filters: creator, period, employee
+    // TODO period filter
     @Override
-    public Page<FixedExpensesDto> findAll(Long creatorId, List<String> types, Pageable pageable) {
-        List<FixedExpensesType> typeList = getTypesList(types);
-
-        Specification<FixedExpenses> spec = Specification.where(
-                FixedExpensesSpecifications.typeIn(typeList));
-
+    public Page<FixedExpensesDto> findAll(List<String> types, List<Long> employees, List<Long> creators, Pageable pageable) {
+        Specification<FixedExpenses> spec = getSpecification(types, employees, creators);
         Page<FixedExpenses> all = repository.findAll(spec, pageable);
         Page<FixedExpensesDto> allDtos = Mapper.mapPage(all, FixedExpensesDto.class);
         return allDtos;
     }
+    private Specification<FixedExpenses> getSpecification(List<String> types, List<Long> employees, List<Long> creators){
+        List<FixedExpensesType> typeList = getTypesList(types);
+        Specification<FixedExpenses> spec = Specification.where(
+                FixedExpensesSpecifications.typeIn(typeList));
 
+        if (employees != null && !employees.isEmpty()) {
+            spec.and(FixedExpensesSpecifications.employeeIn(employees));
+        }
+        if (creators != null && !creators.isEmpty()) {
+            spec.and(FixedExpensesSpecifications.creatorIn(creators));
+        }
+        return spec;
+    }
     private List<FixedExpensesType> getTypesList(List<String> typesString){
         if (typesString == null || typesString.isEmpty()){
             return Arrays.asList(FixedExpensesType.values());
@@ -171,7 +177,6 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         }
         return result;
     }
-
     @Override
     public FixedExpensesDto findById(Long id){
         FixedExpenses expense = repository.findById(id)
@@ -202,7 +207,7 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         newSalary.setDescription(salaryExpenseDto.getDescription());
         salaryRepository.save(newSalary);
 
-        var creatorDto = new AccountantDto(newSalary.getCreator().getId(), newSalary.getCreator().getUsername(), newSalary.getCreator().getName(), newSalary.getCreator().getSurname(), newSalary.getCreator().getEmail());
+        var creatorDto = new EmployeeDto(newSalary.getCreator().getId(), newSalary.getCreator().getUsername(), newSalary.getCreator().getName(), newSalary.getCreator().getSurname(), newSalary.getCreator().getEmail(), newSalary.getCreator().getWage(), newSalary.getCreator().getWorkingHours(), newSalary.getCreator().getOvertimeWage());
         var employeeDto = new EmployeeDto(newSalary.getEmployee().getId(), newSalary.getEmployee().getUsername(), newSalary.getEmployee().getName(), newSalary.getEmployee().getSurname(), newSalary.getEmployee().getEmail(), newSalary.getEmployee().getWage(), newSalary.getEmployee().getWorkingHours(), newSalary.getEmployee().getOvertimeWage());
         return new FixedExpensesDto(newSalary.getId(), newSalary.getType().toString(), newSalary.getPeriod(), newSalary.getAmount(), creatorDto, newSalary.getCreatedOn(), newSalary.getDescription(), employeeDto, newSalary.getOvertimeHours());
     }

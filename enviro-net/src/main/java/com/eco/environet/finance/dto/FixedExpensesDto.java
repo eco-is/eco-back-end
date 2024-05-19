@@ -30,7 +30,7 @@ public class FixedExpensesDto {
     private double amount;
 
     @NotNull(message = "Creator is required")
-    private AccountantDto creator;
+    private EmployeeDto creator;
 
     @NotNull(message = "Creation date is required")
     private Timestamp createdOn;

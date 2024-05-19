@@ -46,11 +46,15 @@ public class DateRange {
         long workingDays = 0;
         LocalDate currentDate = startDate;
 
-        while (currentDate.isBefore(endDate) || currentDate.equals(endDate)) {
-            if (isWorkingDay(currentDate)) {
-                workingDays++;
+        if(endDate != null){
+            while (currentDate.isBefore(endDate) || currentDate.equals(endDate)) {
+                if (isWorkingDay(currentDate)) {
+                    workingDays++;
+                }
+                currentDate = currentDate.plusDays(1);
             }
-            currentDate = currentDate.plusDays(1);
+
+            return workingDays;
         }
 
         return workingDays;
