@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/fixed-expenses")
 @RequiredArgsConstructor
@@ -81,8 +83,38 @@ public class FixedExpensesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
-    // TODO
-    //finaAll
+    @Operation(summary = "Get all fixed expenses")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all fixed expenses",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Page.class)) }),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)
+    })
+    @GetMapping(value="/all")
+    @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
+    public ResponseEntity<Page<FixedExpensesDto>> getAllFixedExpenses(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(name = "types", required = false) List<String> types,
+            // TODO filters
+            @RequestParam(name = "sort", required = false, defaultValue = "type") String sortField,
+            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
+    ) {
+        Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
+        PageRequest pageRequest = PageRequest.of(page, size, sort);
+
+        var result = service.findAll(null, types, pageRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
 
     @Operation(summary = "Get fixed expense")
     @ApiResponses(value = {

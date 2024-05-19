@@ -8,6 +8,7 @@ import com.eco.environet.finance.model.FixedExpenses;
 import com.eco.environet.finance.model.FixedExpensesType;
 import com.eco.environet.finance.model.Salary;
 import com.eco.environet.finance.repository.FixedExpensesRepository;
+import com.eco.environet.finance.repository.FixedExpensesSpecifications;
 import com.eco.environet.finance.repository.SalaryRepository;
 import com.eco.environet.finance.services.FixedExpensesService;
 import com.eco.environet.users.model.Accountant;
@@ -21,11 +22,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -144,11 +147,30 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         return Mapper.map(newExpense, FixedExpensesDto.class);
     }
 
-    // TODO
-//    @Override //filters: type, periods, employees,
-//    public Page<FixedExpensesDto> findAll(List<String> types, Pageable pageable){
-//
-//    }
+    // TODO filters: creator, period, employee
+    @Override
+    public Page<FixedExpensesDto> findAll(Long creatorId, List<String> types, Pageable pageable) {
+        List<FixedExpensesType> typeList = getTypesList(types);
+
+        Specification<FixedExpenses> spec = Specification.where(
+                FixedExpensesSpecifications.typeIn(typeList));
+
+        Page<FixedExpenses> all = repository.findAll(spec, pageable);
+        Page<FixedExpensesDto> allDtos = Mapper.mapPage(all, FixedExpensesDto.class);
+        return allDtos;
+    }
+
+    private List<FixedExpensesType> getTypesList(List<String> typesString){
+        if (typesString == null || typesString.isEmpty()){
+            return Arrays.asList(FixedExpensesType.values());
+        }
+        List<FixedExpensesType> result = new ArrayList<>();
+        for (String type : typesString){
+            FixedExpensesType filtered = FixedExpensesType.valueOf(type);
+            result.add(filtered);
+        }
+        return result;
+    }
 
     @Override
     public FixedExpensesDto findById(Long id){

@@ -2,6 +2,9 @@ package com.eco.environet.finance.repository;
 
 import com.eco.environet.finance.model.FixedExpenses;
 import com.eco.environet.finance.model.FixedExpensesType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +15,7 @@ import java.util.List;
 
 @Repository
 public interface FixedExpensesRepository extends JpaRepository<FixedExpenses, Long> {
+    Page<FixedExpenses> findAll(Specification<FixedExpenses> specification, Pageable pageable);;
     @Query("SELECT f FROM FixedExpenses f WHERE f.type = :type AND f.period.startDate = :startDate AND f.period.endDate = :endDate")
     List<FixedExpenses> findByTypeAndPeriod(@Param("type") FixedExpensesType type, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }
