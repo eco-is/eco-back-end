@@ -266,6 +266,10 @@ VALUES
     ('APPROVED', '2025-01-01', '2025-12-31', '2025 Annual Budget (Approved)', 'Approved Annual Budget Plan', 6, '2024-04-04'),
     ('REJECTED', '2024-07-01', '2024-12-31', '2024 Annual Budget (Rejected)', 'Rejected Annual Budget Plan', 6, '2024-04-04');
 
+INSERT INTO finance.fixed_expenses_estimation(id, budget_plan, fixed_expense_id, type, employee, overtime_hours, start_date, end_date, amount, creator, created_on, description)
+VALUES
+    (1, 1, 0, 'SALARY', 5, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', '');
+
 INSERT INTO finance.organization_goal (
     creator, status, title, start_date, end_date, description, rationale, priority)
 VALUES
