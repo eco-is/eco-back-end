@@ -6,7 +6,7 @@ import com.eco.environet.finance.model.BudgetPlanStatus;
 import com.eco.environet.finance.repository.BudgetPlanRepository;
 import com.eco.environet.finance.repository.BudgetPlanSpecifications;
 import com.eco.environet.finance.services.BudgetPlanService;
-import com.eco.environet.users.model.Accountant;
+import com.eco.environet.users.model.OrganizationMember;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class BudgetPlanServiceImpl implements BudgetPlanService {
         if (!newBudgetPlan.getFiscalDateRange().isValid() || !newBudgetPlan.getFiscalDateRange().isInFuture()) {
             throw new IllegalArgumentException("Invalid fiscal date range");
         }
-        Accountant author = new Accountant();
+        OrganizationMember author = new OrganizationMember();
         author.setId(newBudgetPlan.getAuthor().getId());
 
         BudgetPlan budget = BudgetPlan.builder()

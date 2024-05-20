@@ -3,8 +3,10 @@ package com.eco.environet.users.services.impl;
 import com.eco.environet.users.dto.*;
 import com.eco.environet.users.exception.CredentialsTakenException;
 import com.eco.environet.users.model.Gender;
+import com.eco.environet.users.model.OrganizationMember;
 import com.eco.environet.users.model.Role;
 import com.eco.environet.users.model.User;
+import com.eco.environet.users.repository.OrganizationMemberRepository;
 import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.users.security.auth.JwtService;
 import com.eco.environet.users.services.AuthenticationService;
@@ -29,6 +31,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Value("${baseFrontUrl}")
     private String baseFrontUrl;
     private final UserRepository repository;
+    private final OrganizationMemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
@@ -89,10 +92,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastPasswordResetDate(null)
                 .active(true)
                 .build();
+        OrganizationMember member = new OrganizationMember(user, 18, 8, 20);
 
-        repository.save(user);
-
-        sendConfirmationEmail(user);
+        memberRepository.save(member);
+        User newUser = new User(member.getId(), member.getName(), member.getSurname(), member.getEmail(), member.getUsername(), member.getPassword(), member.getPhoneNumber(), member.getDateOfBirth(), member.getGender(), member.getLastPasswordResetDate(), member.getRole(), member.isEnabled(), member.isActive());
+        sendConfirmationEmail(newUser);
     }
 
     @Override

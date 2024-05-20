@@ -21,5 +21,5 @@ public class BudgetPlanDto {
     private String status;
     private Timestamp lastUpdatedOnDate;
     private DateRange fiscalDateRange;
-    private AccountantDto author;
+    private EmployeeDto author;
 }

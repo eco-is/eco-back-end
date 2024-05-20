@@ -1,7 +1,8 @@
 package com.eco.environet.finance.model;
 
-import com.eco.environet.users.model.Accountant;
+import com.eco.environet.users.model.OrganizationMember;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @Table(name="budget_plan", schema = "finance")
 public class BudgetPlan {
@@ -40,17 +42,7 @@ public class BudgetPlan {
     private DateRange fiscalDateRange;
 
     @ManyToOne
-    private Accountant author;
-
-    public BudgetPlan(Long id, String name, String description, BudgetPlanStatus status, Timestamp lastUpdatedOnDate, DateRange fiscalDateRange, Accountant author) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.status = status;
-        this.lastUpdatedOnDate = lastUpdatedOnDate;
-        this.fiscalDateRange = fiscalDateRange;
-        this.author = author;
-    }
+    private OrganizationMember author;
 
     public void approve(){
         this.status = BudgetPlanStatus.APPROVED;
