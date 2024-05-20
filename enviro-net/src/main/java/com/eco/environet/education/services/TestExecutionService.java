@@ -14,4 +14,6 @@ public interface TestExecutionService {
     TestCompletionResponse finishTest(TestCompletionRequest answers, String username);
 
     TestExecutionDto create(Long lectureId, String username);
+
+    List<TestExecutionDto> findAllByFinished(Boolean finished);
 }

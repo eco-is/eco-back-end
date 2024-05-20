@@ -108,8 +108,23 @@ public class TestExecutionController {
     })
     @GetMapping("/lecture/finished")
     @PreAuthorize("hasRole('REGISTERED_USER')")
-    public ResponseEntity<List<TestExecutionDto>> findAllFinshedForLectureId(@RequestParam Long lectureId) {
+    public ResponseEntity<List<TestExecutionDto>> findAllFinishedForLectureId(@RequestParam Long lectureId) {
         var result = service.findAllByFinishedAndLectureId(true, lectureId);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @Operation(summary = "Fetch all finished tests")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OK",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TestExecutionDto.class))}),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content)
+    })
+    @GetMapping("/finished")
+    @PreAuthorize("hasRole('REGISTERED_USER')")
+    public ResponseEntity<List<TestExecutionDto>> findAllFinished() {
+        var result = service.findAllByFinished(true);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 }

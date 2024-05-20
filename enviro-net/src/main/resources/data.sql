@@ -216,7 +216,11 @@ INSERT INTO education.test_execution (finished, points, lecture_id, user_id)
 VALUES
     (TRUE, 25, 1, 2),
     (TRUE, 15, 1, 3),
-    (TRUE, 5, 1, 4);
+    (TRUE, 5, 1, 4),
+    (TRUE, 23, 2, 2),
+    (TRUE, 11, 2, 3),
+    (FALSE, 0, 2, 4),
+    (TRUE, 7, 3, 2);
 
 
 -- Finance

@@ -64,6 +64,11 @@ public class TestExecutionServiceImpl implements TestExecutionService {
     }
 
     @Override
+    public List<TestExecutionDto> findAllByFinished(Boolean finished) {
+        return Mapper.mapList(testExecutionRepository.findAllByFinished(finished), TestExecutionDto.class);
+    }
+
+    @Override
     public TestCompletionResponse finishTest(TestCompletionRequest testCompletionRequest, String username) {
         var lecture = lectureRepository.findById(testCompletionRequest.getLectureId()).orElseThrow(() -> new EntityNotFoundException("Cannot find lecture with id: " + testCompletionRequest.getLectureId()));
         var user = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Cannot find user with username: " + username));
