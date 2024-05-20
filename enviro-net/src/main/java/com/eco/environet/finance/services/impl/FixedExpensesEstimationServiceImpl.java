@@ -61,12 +61,13 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
     }
 
     @Override
-    public Page<FixedExpensesEstimationDto> generateEstimationForBudgetPlan(Long id, Pageable pageable){
+    public List<FixedExpensesEstimationDto> generateEstimationForBudgetPlan(Long id){
         BudgetPlan budgetPlan = budgetPlanRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Budget Plan not found with ID: " + id));
         List<FixedExpensesEstimation> existing = repository.findByBudgetPlanId(id);
         if (!existing.isEmpty()){
-            return paginate(existing, pageable);
+            existing.forEach(this::setEstimation);
+            return Mapper.mapList(existing, FixedExpensesEstimationDto.class);
         }
 
         OrganizationMember creator = new OrganizationMember();
@@ -76,8 +77,10 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
             Salary newSalary = createSalaryForEmployee(budgetPlan.getFiscalDateRange(), creator, employee);
             FixedExpensesEstimation newEstimation = new FixedExpensesEstimation(budgetPlan, newSalary);
             existing.add(newEstimation);
+            repository.save(newEstimation);
         }
-        return paginate(existing, pageable);
+        existing.forEach(this::setEstimation);
+        return Mapper.mapList(existing, FixedExpensesEstimationDto.class);
     }
     private Salary createSalaryForEmployee(DateRange period, OrganizationMember creator, OrganizationMember employee){
         FixedExpenses newExpense = FixedExpenses.fixedExpensesBuilder()
@@ -122,6 +125,7 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
                 .overtimeHours(0)
                 .build();
         setEstimation(newEstimation);
+        repository.save(newEstimation);
         return Mapper.map(newEstimation, FixedExpensesEstimationDto.class);
     }
 
@@ -129,13 +133,14 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
     public Page<FixedExpensesEstimationDto> findAll(Long budgetPlanId, List<String> types, List<Long> employees, Pageable pageable) {
         Specification<FixedExpensesEstimation> spec = getSpecification(budgetPlanId, types, employees);
         Page<FixedExpensesEstimation> all = repository.findAll(spec, pageable);
-        return paginate(all.toList(), pageable);
+        all.forEach(this::setEstimation);
+        return Mapper.mapPage(all, FixedExpensesEstimationDto.class);
     }
     private Specification<FixedExpensesEstimation> getSpecification(Long budgetPlanId, List<String> types, List<Long> employees){
         List<FixedExpensesType> typeList = getTypesList(types);
         Specification<FixedExpensesEstimation> spec = Specification.where(
-                FixedExpensesEstimationSpecifications.typeIn(typeList));
-        // TODO budget plan id
+                FixedExpensesEstimationSpecifications.typeIn(typeList))
+                .and(FixedExpensesEstimationSpecifications.budgetPlanIn(budgetPlanId));
 
         if (employees != null && !employees.isEmpty()) {
             spec.and(FixedExpensesEstimationSpecifications.employeeIn(employees));

@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/fixed-expenses-estimation")
 @RequiredArgsConstructor
-@Tag(name = "Fixed Expenses Estimation for Budget Planning", description = "Manage Fixed Expenses Estimations")
+@Tag(name = "Fixed Expenses Estimation", description = "Manage Fixed Expenses Estimations for Budget Planning")
 public class FixedExpensesEstimationController {
     private final FixedExpensesEstimationService service;
 
@@ -30,7 +30,7 @@ public class FixedExpensesEstimationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fixed Expenses Estimations fetched!",
                     content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Page.class)) }),
+                            schema = @Schema(implementation = FixedExpensesEstimationDto[].class)) }),
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = @Content),
             @ApiResponse(responseCode = "401", description = "Unauthorized",
@@ -44,17 +44,10 @@ public class FixedExpensesEstimationController {
     })
     @GetMapping(value = "/generate")
     @PreAuthorize("hasRole('ACCOUNTANT')")
-    public ResponseEntity<Page<FixedExpensesEstimationDto>> generate(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(name = "sort", required = false, defaultValue = "period.startDate") String sortField,
-            @RequestParam(name = "direction", required = false, defaultValue = "desc") String sortDirection,
+    public ResponseEntity<List<FixedExpensesEstimationDto>> generate(
             @RequestParam(name = "budgetPlanId", required = true) Long budgetPlanId
     ) {
-        Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
-        PageRequest pageRequest = PageRequest.of(page, size, sort);
-
-        var result = service.generateEstimationForBudgetPlan(budgetPlanId, pageRequest);
+        var result = service.generateEstimationForBudgetPlan(budgetPlanId);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

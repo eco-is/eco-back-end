@@ -266,9 +266,21 @@ VALUES
     ('APPROVED', '2025-01-01', '2025-12-31', '2025 Annual Budget (Approved)', 'Approved Annual Budget Plan', 6, '2024-04-04'),
     ('REJECTED', '2024-07-01', '2024-12-31', '2024 Annual Budget (Rejected)', 'Rejected Annual Budget Plan', 6, '2024-04-04');
 
-INSERT INTO finance.fixed_expenses_estimation(id, budget_plan, fixed_expense_id, type, employee, overtime_hours, start_date, end_date, amount, creator, created_on, description)
-VALUES
-    (1, 1, 0, 'SALARY', 5, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', '');
+-- INSERT INTO finance.fixed_expenses_estimation
+--     (id, budget_plan, fixed_expense_id, type, employee, overtime_hours, start_date, end_date, amount, creator, created_on, description)
+-- VALUES
+--     ( 1, 1, 0,   'RENT', null, 0,'2024-01-01', '2024-02-01', 3500, 5, '2024-02-12 12:00:00.000', 'Rent for January 2024'),
+--     ( 2, 1, 0, 'SALARY',    5, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 3, 1, 0, 'SALARY',    6, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 4, 1, 0, 'SALARY',    7, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 5, 1, 0, 'SALARY',    8, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 6, 1, 0, 'SALARY',    9, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 7, 1, 0, 'SALARY',   10, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 8, 1, 0, 'SALARY',   11, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     ( 9, 1, 0, 'SALARY',   12, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     (10, 1, 0, 'SALARY',   13, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     (11, 1, 0, 'SALARY',   14, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', ''),
+--     (12, 1, 0, 'SALARY',   15, 0,'2024-01-01', '2024-02-01', 2350, 5, '2024-02-12 12:00:00.000', '');
 
 INSERT INTO finance.organization_goal (
     creator, status, title, start_date, end_date, description, rationale, priority)

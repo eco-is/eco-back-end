@@ -13,6 +13,6 @@ import java.util.List;
 
 public interface FixedExpensesEstimationRepository extends JpaRepository<FixedExpensesEstimation, Long> {
     Page<FixedExpensesEstimation> findAll(Specification<FixedExpensesEstimation> specification, Pageable pageable);;
-    @Query("SELECT f FROM FixedExpensesEstimation f WHERE f.budgetPlan = :id")
+    @Query("SELECT f FROM FixedExpensesEstimation f WHERE f.budgetPlan.id = :id")
     List<FixedExpensesEstimation> findByBudgetPlanId(@Param("id") Long id);
 }

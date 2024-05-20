@@ -8,9 +8,9 @@ import java.util.List;
 
 public class FixedExpensesEstimationSpecifications {
     private FixedExpensesEstimationSpecifications (){}
-//    public static Specification<FixedExpenses> budgetPlanIn(Long budgetPlanId){
-//        return ((root, query, criteriaBuilder) -> root.get("budgetPlan").get("id").in(budgetPlanId));
-//    }
+    public static Specification<FixedExpensesEstimation> budgetPlanIn(Long budgetPlanId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("budgetPlan").get("id"), budgetPlanId);
+    }
     public static Specification<FixedExpensesEstimation> employeeIn(List<Long> employeeList){
         return ((root, query, criteriaBuilder) -> root.get("employee").get("id").in(employeeList));
     }

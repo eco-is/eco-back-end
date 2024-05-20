@@ -27,7 +27,7 @@ public class FixedExpensesEstimation {
     private BudgetPlan budgetPlan;
 
     // Add fields from FixedExpenses
-    @Column(name = "fixed_expense_id", nullable = false)
+    @Column(name = "fixed_expense_id")
     private Long fixedExpenseId;
 
     @Enumerated(EnumType.STRING)
