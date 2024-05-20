@@ -3,11 +3,13 @@ package com.eco.environet.finance.services.impl;
 import com.eco.environet.finance.dto.BudgetPlanDto;
 import com.eco.environet.finance.model.BudgetPlan;
 import com.eco.environet.finance.model.BudgetPlanStatus;
+import com.eco.environet.finance.model.DateRange;
 import com.eco.environet.finance.repository.BudgetPlanRepository;
 import com.eco.environet.finance.repository.BudgetPlanSpecifications;
 import com.eco.environet.finance.services.BudgetPlanService;
 import com.eco.environet.users.model.OrganizationMember;
 import com.eco.environet.util.Mapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +29,7 @@ import java.util.List;
 public class BudgetPlanServiceImpl implements BudgetPlanService {
     @Value("${baseFrontUrl}")
     private String baseFrontUrl;
+    private final ObjectMapper objectMapper;
     private final BudgetPlanRepository repository;
 
     @Override
@@ -48,22 +52,41 @@ public class BudgetPlanServiceImpl implements BudgetPlanService {
         repository.save(budget);
         return Mapper.map(budget, BudgetPlanDto.class);
     }
-
-    //  TODO - date range filter
-    //  TODO - Author search filter
     @Override
-    public Page<BudgetPlanDto> findAll(Long currentUserId, String name, List<String> statuses, Pageable pageable) {
-        List<BudgetPlanStatus> statusList = getStatusListFromStringList(statuses);
-
-        Specification<BudgetPlan> spec = Specification.where(
-                StringUtils.isBlank(name) ? null : BudgetPlanSpecifications.nameLike(name))
-                .and(BudgetPlanSpecifications.statusIn(statusList, currentUserId));
-
+    public Page<BudgetPlanDto> findAll(Long currentUserId, String name, String period, List<String> statuses, List<Long> authors, Pageable pageable) {
+        Specification<BudgetPlan> spec = getSpecification(currentUserId, name, period, statuses, authors);
         Page<BudgetPlan> allPlans = repository.findAll(spec, pageable);
         Page<BudgetPlanDto> allPlansDto = Mapper.mapPage(allPlans, BudgetPlanDto.class);
         return allPlansDto;
     }
-
+    private Specification<BudgetPlan> getSpecification(Long currentUserId, String name, String period, List<String> statuses, List<Long> authors) {
+        DateRange dateRange = getDateRange(period);
+        List<BudgetPlanStatus> statusList = getStatusListFromStringList(statuses);
+        return Specification.where(
+                StringUtils.isBlank(name) ? null : BudgetPlanSpecifications.nameLike(name))
+                .and(BudgetPlanSpecifications.statusIn(statusList, currentUserId))
+                .and(BudgetPlanSpecifications.afterStartDate(dateRange))
+                .and(BudgetPlanSpecifications.beforeEndDate(dateRange))
+                .and(BudgetPlanSpecifications.authorIn(authors));
+    }
+    private DateRange getDateRange(String period) {
+        DateRange dateRange = new DateRange();
+        if (dateRange.getEndDate() == null){
+            dateRange.setStartDate(null);
+        }
+        if (period != null && !period.isEmpty() && !period.equals("undefined")) {
+            try {
+                dateRange = objectMapper.readValue(period, DateRange.class);
+            } catch (IOException e) {
+                // Handle the exception or throw a custom exception
+                throw new IllegalArgumentException("Invalid period format", e);
+            }
+        }
+        if (!dateRange.isValid()) {
+            throw new IllegalArgumentException("Invalid period " + period);
+        }
+        return dateRange;
+    }
     private List<BudgetPlanStatus> getStatusListFromStringList(List<String> statuses) {
         if (statuses == null || statuses.isEmpty()) {
             return BudgetPlanStatus.getAllValidStatus();

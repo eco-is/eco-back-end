@@ -138,14 +138,10 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
     }
     private Specification<FixedExpensesEstimation> getSpecification(Long budgetPlanId, List<String> types, List<Long> employees){
         List<FixedExpensesType> typeList = getTypesList(types);
-        Specification<FixedExpensesEstimation> spec = Specification.where(
+        return Specification.where(
                 FixedExpensesEstimationSpecifications.typeIn(typeList))
-                .and(FixedExpensesEstimationSpecifications.budgetPlanIn(budgetPlanId));
-
-        if (employees != null && !employees.isEmpty()) {
-            spec.and(FixedExpensesEstimationSpecifications.employeeIn(employees));
-        }
-        return spec;
+                .and(FixedExpensesEstimationSpecifications.budgetPlanIn(budgetPlanId))
+                .and(FixedExpensesEstimationSpecifications.employeeIn(employees));
     }
     private List<FixedExpensesType> getTypesList(List<String> typesString){
         if (typesString == null || typesString.isEmpty()){

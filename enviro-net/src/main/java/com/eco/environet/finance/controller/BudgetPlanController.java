@@ -73,15 +73,16 @@ public class BudgetPlanController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(name="id") Long id,
             @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "period", required = false) String period,
             @RequestParam(name = "statuses", required = false) List<String> statuses,
-            // TODO filters
+            @RequestParam(name = "authors", required = false) List<Long> authors,
             @RequestParam(name = "sort", required = false, defaultValue = "name") String sortField,
             @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(id, name, statuses, pageRequest);
+        var result = service.findAll(id, name, period, statuses, authors, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

@@ -14,6 +14,7 @@ import com.eco.environet.users.model.OrganizationMember;
 import com.eco.environet.users.model.Role;
 import com.eco.environet.users.repository.OrganizationMemberRepository;
 import com.eco.environet.util.Mapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,18 +24,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class FixedExpensesServiceImpl  implements FixedExpensesService {
     @Value("${baseFrontUrl}")
     private String baseFrontUrl;
+    private final ObjectMapper objectMapper;
     private final FixedExpensesRepository repository;
     private final SalaryRepository salaryRepository;
     private final OrganizationMemberRepository organizationMemberRepository;
@@ -154,26 +154,40 @@ public class FixedExpensesServiceImpl  implements FixedExpensesService {
         return Mapper.map(newExpense, FixedExpensesDto.class);
     }
 
-    // TODO period filter
     @Override
-    public Page<FixedExpensesDto> findAll(List<String> types, List<Long> employees, List<Long> creators, Pageable pageable) {
-        Specification<FixedExpenses> spec = getSpecification(types, employees, creators);
+    public Page<FixedExpensesDto> findAll(String period, List<String> types, List<Long> employees, List<Long> creators, Pageable pageable) {
+        Specification<FixedExpenses> spec = getSpecification(period, types, employees, creators);
         Page<FixedExpenses> all = repository.findAll(spec, pageable);
         Page<FixedExpensesDto> allDtos = Mapper.mapPage(all, FixedExpensesDto.class);
         return allDtos;
     }
-    private Specification<FixedExpenses> getSpecification(List<String> types, List<Long> employees, List<Long> creators){
+    private Specification<FixedExpenses> getSpecification(String period, List<String> types, List<Long> employees, List<Long> creators){
+        DateRange dateRange = getDateRange(period);
         List<FixedExpensesType> typeList = getTypesList(types);
-        Specification<FixedExpenses> spec = Specification.where(
-                FixedExpensesSpecifications.typeIn(typeList));
-
-        if (employees != null && !employees.isEmpty()) {
-            spec.and(FixedExpensesSpecifications.employeeIn(employees));
+        return Specification.where(
+                FixedExpensesSpecifications.typeIn(typeList))
+                .and(FixedExpensesSpecifications.afterStartDate(dateRange))
+                .and(FixedExpensesSpecifications.beforeEndDate(dateRange))
+                .and(FixedExpensesSpecifications.employeeIn(employees))
+                .and(FixedExpensesSpecifications.creatorIn(creators));
+    }
+    private DateRange getDateRange(String period) {
+        DateRange dateRange = new DateRange();
+        if (dateRange.getEndDate() == null){
+            dateRange.setStartDate(null);
         }
-        if (creators != null && !creators.isEmpty()) {
-            spec.and(FixedExpensesSpecifications.creatorIn(creators));
+        if (period != null && !period.isEmpty() && !period.equals("undefined")) {
+            try {
+                dateRange = objectMapper.readValue(period, DateRange.class);
+            } catch (IOException e) {
+                // Handle the exception or throw a custom exception
+                throw new IllegalArgumentException("Invalid period format", e);
+            }
         }
-        return spec;
+        if (!dateRange.isValid()) {
+            throw new IllegalArgumentException("Invalid period " + period);
+        }
+        return dateRange;
     }
     private List<FixedExpensesType> getTypesList(List<String> typesString){
         if (typesString == null || typesString.isEmpty()){
