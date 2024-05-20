@@ -1,7 +1,6 @@
 package com.eco.environet.users.controller;
 
 import com.eco.environet.users.dto.UserInfoDto;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -46,15 +47,7 @@ public class UserController {
                     content = @Content)})
     @GetMapping(value="/get-user/{id}")
     public ResponseEntity<UserInfoDto> getUser(@PathVariable Long id) {
-        // Fetch the currently authenticated user
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-
         var result = service.findUser(id);
-        // Check if the authenticated user matches the requested user
-//        if (!result.getUsername().equals(currentUsername)) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-//        }
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
@@ -146,6 +139,29 @@ public class UserController {
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
         var result = service.findAllOrganizationMembers(name, surname, email, pageRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(result);
+    }
+
+    @Operation(summary = "Get all users with roles")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Fetched all users with roles",
+                    content = { @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserDto[].class))}),
+            @ApiResponse(responseCode = "400", description = "Bad Request",
+                    content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found",
+                    content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error",
+                    content = @Content)
+    })
+    @GetMapping(value="/user-roles")
+    @PreAuthorize("hasAnyRole('ADMINISTRATOR', 'BOARD_MEMBER', 'ACCOUNTANT')")
+    public ResponseEntity<List<UserDto>> getAllUsersByRoles(@RequestParam(name = "roles", required = false) List<String> roles) {
+        var result = service.findAllUsersByRoles(roles);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
