@@ -15,4 +15,12 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Assignme
 
     @Query("SELECT a FROM Assignment a WHERE a.documentId = :documentId AND a.projectId = :projectId")
     List<Assignment> findByDocument(Long documentId, Long projectId);
+
+    @Query("SELECT a FROM Assignment a WHERE a.userId = :userId")
+    List<Assignment> findByUser(Long userId);
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+            "FROM Assignment a " +
+            "WHERE a.documentId = :documentId AND a.projectId = :projectId AND a.userId = :userId AND a.task = 'WRITE'")
+    Boolean isWriter(Long documentId, Long projectId, Long userId);
 }

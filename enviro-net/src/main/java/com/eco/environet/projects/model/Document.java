@@ -26,4 +26,8 @@ public class Document {
     @Embedded
     @Column(nullable = false)
     private DocumentProgress progress;
+
+    public void updateProgress (double progress) {
+        this.progress.setProgress(progress);
+    }
 }

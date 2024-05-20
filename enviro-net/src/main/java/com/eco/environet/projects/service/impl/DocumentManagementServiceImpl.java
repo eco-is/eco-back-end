@@ -3,31 +3,37 @@ package com.eco.environet.projects.service.impl;
 import com.eco.environet.projects.dto.*;
 import com.eco.environet.projects.model.*;
 import com.eco.environet.projects.model.id.DocumentId;
+import com.eco.environet.projects.model.id.DocumentVersionId;
+import com.eco.environet.projects.repository.AssignmentRepository;
 import com.eco.environet.projects.repository.DocumentRepository;
 import com.eco.environet.projects.repository.DocumentVersionRepository;
 import com.eco.environet.projects.repository.ProjectRepository;
 import com.eco.environet.projects.service.DocumentManagementService;
-import com.eco.environet.projects.service.ProjectManagementService;
 import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.Mapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.event.ListDataEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional
@@ -38,9 +44,11 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     private String projectFilePath;
     private final ProjectRepository projectRepository;
     private final DocumentRepository documentRepository;
-    private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentVersionRepository versionRepository;
+    private final AssignmentRepository assignmentRepository;
+    private final UserRepository userRepository;
 
-    public DocumentDto uploadDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
+    public DocumentDto createDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
         if (projectId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
             throw new IllegalArgumentException("Invalid parameters for document upload");
         }
@@ -48,11 +56,40 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("Project not found"));
 
-        Path filePath = saveFile(documentDto.getName(), documentDto.getFile(), project.getName());
+        Path filePath = saveFile(documentDto.getName(), documentDto.getFile(), project.getName(), 0L);
         Document savedDocument = createDocument(projectId, documentDto.getName());
-        createDocumentVersion(project, filePath, savedDocument);
+        createDocumentVersion(filePath, savedDocument, project.getManager());
 
         return  Mapper.map(savedDocument, DocumentDto.class);
+    }
+
+    @Override
+    public DocumentDto uploadDocument(Long projectId, Long documentId, DocumentUploadDto documentDto) throws IOException {
+        if (projectId == null || documentId == null|| documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
+            throw new IllegalArgumentException("Invalid parameters for document upload");
+        }
+
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
+        Document document = documentRepository.findByDocumentIdAndProjectId(documentId, projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        User author = userRepository.findById(documentDto.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (!assignmentRepository.isWriter(documentId, projectId, documentDto.getUserId())) {
+            throw new IllegalArgumentException("Uploader isn't assigned to document");
+        }
+
+        if(documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
+            updateProgress(documentDto, document);
+        }
+
+        Path filePath = saveFile(document.getName(), documentDto.getFile(), project.getName(), versionRepository.getNextVersion(projectId, documentId));
+        createDocumentVersion(filePath, document, author);
+
+        return  Mapper.map(document, DocumentDto.class);
     }
 
     @Override
@@ -62,13 +99,72 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         Document document = documentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
-        List<DocumentVersion> documentVersions = documentVersionRepository.findByDocumentId(documentId);
+        List<DocumentVersion> documentVersions = versionRepository.findByDocumentIdAndProjectId(documentId, projectId);
         for (DocumentVersion version : documentVersions) {
             deleteDocumentVersionFromFileSystem(version.getFilePath());
         }
 
-        documentVersionRepository.deleteAll(documentVersions);
+        versionRepository.deleteAll(documentVersions);
         documentRepository.delete(document);
+    }
+
+    @Override
+    public DocumentVersionsDto getDocumentVersions(Long projectId, Long documentId) {
+        if (projectId == null || documentId == null) {
+            throw new IllegalArgumentException("Invalid parameters for document upload");
+        }
+
+        Document document = documentRepository.findByDocumentIdAndProjectId(documentId, projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Document not found"));
+
+        List<Long> versions = versionRepository.findByDocumentIdAndProjectId(documentId, projectId)
+                .stream().map(DocumentVersion::getVersion)
+                .toList();
+
+        DocumentVersionsDto versionsDto = new DocumentVersionsDto();
+        versionsDto.setDocumentName(document.getName());
+        versionsDto.setVersions(versions);
+        versionsDto.setProgress(document.getProgress());
+
+        return versionsDto;
+    }
+
+    @Override
+    public List<DocumentTaskDto> getAssignedDocuments(Long userId) {
+        List<Assignment> assignments = assignmentRepository.findByUser(userId);
+
+        return assignments.stream()
+                .map(assignment -> {
+                    DocumentId id = new DocumentId(assignment.getProjectId(), assignment.getDocumentId());
+                    Document document = documentRepository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException("Document not found for ID: " + assignment.getDocumentId()));
+
+                    DocumentTaskDto dto = new DocumentTaskDto();
+                    dto.setDocumentId(document.getDocumentId());
+                    dto.setProjectId(document.getProjectId());
+                    dto.setName(document.getName());
+                    dto.setProgress(document.getProgress());
+                    dto.setTask(assignment.getTask());
+
+                    return dto;
+                }).toList();
+    }
+
+    public Resource getDocumentFile(Long projectId, Long documentId, Long version) throws IOException {
+        DocumentVersionId id = new DocumentVersionId(projectId, documentId, version);
+        DocumentVersion documentVersion = versionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Document version not found"));
+
+        Path filePath = Paths.get(documentVersion.getFilePath());
+        Resource resource = new UrlResource(filePath.toUri());
+
+        return Optional.of(resource)
+                .orElseThrow(() -> new FileNotFoundException("File not found " + documentVersion.getFilePath()));
+    }
+
+    private void updateProgress(DocumentUploadDto documentDto, Document document) {
+        document.updateProgress(documentDto.getProgress());
+        documentRepository.save(document);
     }
 
     private Document createDocument(Long projectId, String documentName) {
@@ -79,20 +175,19 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         return documentRepository.save(document);
     }
 
-    private void createDocumentVersion(Project project, Path filePath, Document savedDocument) {
+    private void createDocumentVersion(Path filePath, Document savedDocument, User author) {
         DocumentVersion documentVersion = new DocumentVersion();
-        documentVersion.setVersion(0L);
         documentVersion.setDocumentId(savedDocument.getDocumentId());
         documentVersion.setProjectId(savedDocument.getProjectId());
         documentVersion.setFilePath(filePath.toString());
-        documentVersion.setAuthor(project.getManager());
-        documentVersionRepository.save(documentVersion);
+        documentVersion.setAuthor(author);
+        versionRepository.save(documentVersion);
     }
 
-    private Path saveFile(String documentName, MultipartFile file, String projectName) throws IOException {
+    private Path saveFile(String documentName, MultipartFile file, String projectName, Long version) throws IOException {
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String extension = StringUtils.getFilenameExtension(originalFilename);
-        String filename = documentName.replaceAll("\\s+", "_").toLowerCase() + "_v0." + extension;
+        String filename = documentName.replaceAll("\\s+", "_").toLowerCase() + "_v"+ version + "." + extension;
 
         Path projectFolder = createProjectFolder(projectName);
 

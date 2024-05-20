@@ -26,5 +26,6 @@ public class DocumentVersion {
     private String filePath;
 
     @ManyToOne
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
     private User author;
 }

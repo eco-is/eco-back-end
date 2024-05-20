@@ -35,18 +35,6 @@ public class ProjectManagementController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Fetch project with basic info")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Created project with basic info", content = @Content(mediaType = "application/json")),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = "text/plain"))
-    })
-    @PostMapping("/{projectId}")
-    @PreAuthorize("hasRole('PROJECT_MANAGER')")
-    public ResponseEntity<ProjectDto> getProject(@PathVariable Long projectId) {
-        ProjectDto result = projectManagementService.get(projectId);
-        return ResponseEntity.ok(result);
-    }
-
     @Operation(summary = "Update project")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Updated project", content = @Content(mediaType = "application/json")),
