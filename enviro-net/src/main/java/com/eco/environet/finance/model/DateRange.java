@@ -1,8 +1,7 @@
 package com.eco.environet.finance.model;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -41,5 +40,49 @@ public class DateRange {
         //return ChronoUnit.DAYS.between(startDate, endDate);
         LocalDate endDateToUse = endDate != null ? endDate : LocalDate.now();
         return ChronoUnit.DAYS.between(startDate, endDateToUse);
+    }
+
+    public long getWorkingDays() {
+        long workingDays = 0;
+        LocalDate currentDate = startDate;
+
+        if(endDate != null){
+            while (currentDate.isBefore(endDate) || currentDate.equals(endDate)) {
+                if (isWorkingDay(currentDate)) {
+                    workingDays++;
+                }
+                currentDate = currentDate.plusDays(1);
+            }
+
+            return workingDays;
+        }
+
+        return workingDays;
+    }
+
+    // TODO // Hardcoded holidays
+    private static final LocalDate[] hardcodedHolidays = {
+            LocalDate.of(0, 1, 1),  // New Year's Day
+            LocalDate.of(0, 2, 15), // Independence Day
+            LocalDate.of(0, 2, 16), // Independence Day
+            LocalDate.of(0, 5, 1),  // International Work Day
+            LocalDate.of(0, 5, 2),  // International Work Day
+            LocalDate.of(0, 12, 25), // Catholic Christmas Day
+            LocalDate.of(0, 1, 7),  // Orthodox Christmas Day
+            // Add more holidays as needed
+    };
+    private boolean isWorkingDay(LocalDate date) {
+        // Check if the day falls on a weekend (Saturday or Sunday)
+        DayOfWeek dayOfWeek = date.getDayOfWeek();
+        if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+            return false;
+        }
+        // Check if the day falls on a holiday
+        for (LocalDate holiday : hardcodedHolidays) {
+            if (holiday.equals(date)) {
+                return false; // It's a holiday
+            }
+        }
+        return true;
     }
 }
