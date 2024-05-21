@@ -1,6 +1,5 @@
 package com.eco.environet.projects.repository;
 
-import com.eco.environet.projects.model.Document;
 import com.eco.environet.projects.model.TeamMember;
 import com.eco.environet.projects.model.id.TeamMemberId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +12,7 @@ import java.util.List;
 public interface TeamMemberRepository extends JpaRepository<TeamMember, TeamMemberId> {
 
     List<TeamMember> findByProjectId(Long projectId);
+
     List<TeamMember> findAllByProjectIdAndUserIdIn(Long projectId, List<Long> userIds);
 
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END " +

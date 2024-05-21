@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Transactional
@@ -28,6 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final DocumentVersionRepository versionRepository;
     private final DocumentRepository documentRepository;
     private final AssignmentRepository assignmentRepository;
+    private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -108,9 +108,14 @@ public class ReviewServiceImpl implements ReviewService {
         documentDto.setDocumentId(documentId);
         documentDto.setVersion(request.getDocumentVersion().getVersion());
 
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
         Document document = documentRepository.findByDocumentIdAndProjectId(documentId, projectId)
+
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
-        documentDto.setName(document.getName());
+        documentDto.setProjectName(project.getName());
+        documentDto.setDocumentName(document.getName());
         documentDto.setProgress(document.getProgress());
         documentDto.setTask(Task.REVIEW);
 

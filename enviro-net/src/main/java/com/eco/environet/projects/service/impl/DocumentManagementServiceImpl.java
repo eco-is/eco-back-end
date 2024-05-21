@@ -22,18 +22,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.event.ListDataEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional
@@ -60,12 +57,12 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         Document savedDocument = createDocument(projectId, documentDto.getName());
         createDocumentVersion(filePath, savedDocument, project.getManager());
 
-        return  Mapper.map(savedDocument, DocumentDto.class);
+        return Mapper.map(savedDocument, DocumentDto.class);
     }
 
     @Override
     public DocumentDto uploadDocument(Long projectId, Long documentId, DocumentUploadDto documentDto) throws IOException {
-        if (projectId == null || documentId == null|| documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
+        if (projectId == null || documentId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
             throw new IllegalArgumentException("Invalid parameters for document upload");
         }
 
@@ -82,14 +79,14 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
             throw new IllegalArgumentException("Uploader isn't assigned to document");
         }
 
-        if(documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
+        if (documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
             updateProgress(documentDto, document);
         }
 
         Path filePath = saveFile(document.getName(), documentDto.getFile(), project.getName(), versionRepository.getNextVersion(projectId, documentId));
         createDocumentVersion(filePath, document, author);
 
-        return  Mapper.map(document, DocumentDto.class);
+        return Mapper.map(document, DocumentDto.class);
     }
 
     @Override
@@ -136,13 +133,18 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         return assignments.stream()
                 .map(assignment -> {
                     DocumentId id = new DocumentId(assignment.getProjectId(), assignment.getDocumentId());
+
+                    Project project = projectRepository.findById(id.getProjectId())
+                            .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
                     Document document = documentRepository.findById(id)
-                            .orElseThrow(() -> new EntityNotFoundException("Document not found for ID: " + assignment.getDocumentId()));
+                            .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
                     DocumentTaskDto dto = new DocumentTaskDto();
                     dto.setDocumentId(document.getDocumentId());
                     dto.setProjectId(document.getProjectId());
-                    dto.setName(document.getName());
+                    dto.setProjectName(project.getName());
+                    dto.setDocumentName(document.getName());
                     dto.setProgress(document.getProgress());
                     dto.setTask(assignment.getTask());
 
@@ -187,7 +189,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     private Path saveFile(String documentName, MultipartFile file, String projectName, Long version) throws IOException {
         String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String extension = StringUtils.getFilenameExtension(originalFilename);
-        String filename = documentName.replaceAll("\\s+", "_").toLowerCase() + "_v"+ version + "." + extension;
+        String filename = documentName.replaceAll("\\s+", "_").toLowerCase() + "_v" + version + "." + extension;
 
         Path projectFolder = createProjectFolder(projectName);
 

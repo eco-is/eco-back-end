@@ -1,10 +1,7 @@
 package com.eco.environet.projects.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.sql.Timestamp;
 
 @Data
 public class DocumentReviewCreationDto {

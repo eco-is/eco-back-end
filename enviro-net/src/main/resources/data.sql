@@ -366,10 +366,8 @@ INSERT INTO projects.assignments (document_id, project_id, user_id, task)
 VALUES
     -- Conservation of Wetlands
     (1, 1, 13, 'WRITE'), (1, 1, 11, 'REVIEW'), (1, 1, 12, 'REVIEW'),
-    (2, 1, 13, 'WRITE'), (2, 1, 11, 'REVIEW'), (2, 1, 12, 'REVIEW'),
     -- Reforestation Initiative
-    (1, 2, 5, 'WRITE'), (1, 2, 6, 'REVIEW'), (1, 2, 7, 'WRITE'), (1, 2, 8, 'REVIEW'),
-    (1, 2, 9, 'WRITE'), (1, 2, 12, 'REVIEW'), (1, 2, 13, 'WRITE'), (1, 2, 14, 'REVIEW');
+    (1, 2, 13, 'WRITE'), (1, 2, 6, 'REVIEW'), (1, 2, 7, 'WRITE'), (1, 2, 8, 'REVIEW');
 
 INSERT INTO projects.review_requests (request_date, version, document_id, project_id, status, is_reviewed)
 VALUES

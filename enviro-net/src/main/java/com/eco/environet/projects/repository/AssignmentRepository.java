@@ -1,10 +1,8 @@
 package com.eco.environet.projects.repository;
 
 import com.eco.environet.projects.model.Assignment;
-import com.eco.environet.projects.model.Document;
 import com.eco.environet.projects.model.Task;
 import com.eco.environet.projects.model.id.AssignmentId;
-import com.eco.environet.projects.model.id.DocumentId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

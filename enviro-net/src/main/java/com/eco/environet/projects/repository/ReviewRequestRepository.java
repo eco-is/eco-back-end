@@ -1,8 +1,6 @@
 package com.eco.environet.projects.repository;
 
-import com.eco.environet.projects.model.Assignment;
 import com.eco.environet.projects.model.ReviewRequest;
-import com.eco.environet.projects.model.id.AssignmentId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

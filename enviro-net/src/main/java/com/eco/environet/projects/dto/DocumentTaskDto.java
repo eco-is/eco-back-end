@@ -12,7 +12,8 @@ public class DocumentTaskDto {
     private Long documentId;
     private Long projectId;
     private Long version;
-    private String name;
+    private String projectName;
+    private String documentName;
     private DocumentProgress progress;
     private Task task;
 }
