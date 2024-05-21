@@ -111,6 +111,9 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
             throw new IllegalArgumentException("Invalid parameters for document upload");
         }
 
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project not found"));
+
         Document document = documentRepository.findByDocumentIdAndProjectId(documentId, projectId)
                 .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
@@ -118,12 +121,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
                 .stream().map(DocumentVersion::getVersion)
                 .toList();
 
-        DocumentVersionsDto versionsDto = new DocumentVersionsDto();
-        versionsDto.setDocumentName(document.getName());
-        versionsDto.setVersions(versions);
-        versionsDto.setProgress(document.getProgress());
-
-        return versionsDto;
+        return mapDocumentVersionsDto(project, document, versions);
     }
 
     @Override
@@ -140,15 +138,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
                     Document document = documentRepository.findById(id)
                             .orElseThrow(() -> new EntityNotFoundException("Document not found"));
 
-                    DocumentTaskDto dto = new DocumentTaskDto();
-                    dto.setDocumentId(document.getDocumentId());
-                    dto.setProjectId(document.getProjectId());
-                    dto.setProjectName(project.getName());
-                    dto.setDocumentName(document.getName());
-                    dto.setProgress(document.getProgress());
-                    dto.setTask(assignment.getTask());
-
-                    return dto;
+                    return mapDocumentTaskDto(assignment, project, document);
                 }).toList();
     }
 
@@ -184,6 +174,26 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         documentVersion.setFilePath(filePath.toString());
         documentVersion.setAuthor(author);
         versionRepository.save(documentVersion);
+    }
+
+    private DocumentVersionsDto mapDocumentVersionsDto(Project project, Document document, List<Long> versions) {
+        DocumentVersionsDto dto = new DocumentVersionsDto();
+        dto.setProjectName(project.getName());
+        dto.setDocumentName(document.getName());
+        dto.setVersions(versions);
+        dto.setProgress(document.getProgress());
+        return dto;
+    }
+
+    private DocumentTaskDto mapDocumentTaskDto(Assignment assignment, Project project, Document document) {
+        DocumentTaskDto dto = new DocumentTaskDto();
+        dto.setDocumentId(document.getDocumentId());
+        dto.setProjectId(document.getProjectId());
+        dto.setProjectName(project.getName());
+        dto.setDocumentName(document.getName());
+        dto.setProgress(document.getProgress());
+        dto.setTask(assignment.getTask());
+        return dto;
     }
 
     private Path saveFile(String documentName, MultipartFile file, String projectName, Long version) throws IOException {
