@@ -258,19 +258,19 @@ VALUES
 -- Projects
 INSERT INTO projects.projects (name, description, duration_months, budget, type, status, manager_id)
 VALUES
-    ('Conservation of Wetlands', 'Protecting and restoring wetland ecosystems', 24, 50000.00, 'INTERNAL', 'DRAFT', 11),
-    ('Reforestation Initiative', 'Planting trees and restoring forest habitats', 18, 30000.00, 'EXTERNAL', 'PENDING', 11),
-    ('Urban Green Spaces Development', 'Creating parks and green areas in urban settings', 12, 25000.00, 'INTERNAL', 'APPROVED', 11),
-    ('River Cleanup Campaign', 'Cleaning up polluted rivers and waterways', 6, 10000.00, 'EXTERNAL', 'ONGOING', 11),
-    ('Biodiversity Monitoring Program', 'Monitoring and preserving local biodiversity', 36, 75000.00, 'INTERNAL', 'REJECTED', 11),
-    ('Sustainable Agriculture Project', 'Promoting eco-friendly farming practices', 24, 60000.00, 'EXTERNAL', 'ARCHIVED', 11),
-    ('Ocean Conservation Initiative', 'Protecting marine life and habitats', 36, 80000.00, 'INTERNAL', 'ONGOING', 11),
-    ('Eco-friendly Transportation Campaign', 'Promoting sustainable transport options', 12, 20000.00, 'EXTERNAL', 'PENDING', 11),
-    ('Wildlife Habitat Restoration', 'Restoring habitats for endangered species', 24, 60000.00, 'INTERNAL', 'ONGOING', 10),
-    ('Green Energy Development Project', 'Promoting renewable energy solutions', 18, 35000.00, 'EXTERNAL', 'APPROVED', 10),
-    ('Community Gardens Initiative', 'Creating communal spaces for sustainable gardening', 9, 15000.00, 'INTERNAL', 'ONGOING', 10),
-    ('Eco-tourism Promotion Program', 'Encouraging responsible tourism practices', 24, 40000.00, 'EXTERNAL', 'PENDING', 10),
-    ('Waste Recycling Campaign', 'Promoting waste reduction and recycling', 6, 10000.00, 'INTERNAL', 'ARCHIVED', 13),
+    ('Conservation of Wetlands', 'Protecting and restoring wetland ecosystems', 24, 50000.00, 'INTERNAL', 'DRAFT', 10),
+    ('Reforestation Initiative', 'Planting trees and restoring forest habitats', 18, 30000.00, 'EXTERNAL', 'PENDING', 10),
+    ('Urban Green Spaces Development', 'Creating parks and green areas in urban settings', 12, 25000.00, 'INTERNAL', 'APPROVED', 10),
+    ('River Cleanup Campaign', 'Cleaning up polluted rivers and waterways', 6, 10000.00, 'EXTERNAL', 'ONGOING', 10),
+    ('Biodiversity Monitoring Program', 'Monitoring and preserving local biodiversity', 36, 75000.00, 'INTERNAL', 'REJECTED', 10),
+    ('Sustainable Agriculture Project', 'Promoting eco-friendly farming practices', 24, 60000.00, 'EXTERNAL', 'ARCHIVED', 10),
+    ('Ocean Conservation Initiative', 'Protecting marine life and habitats', 36, 80000.00, 'INTERNAL', 'ONGOING', 10),
+    ('Eco-friendly Transportation Campaign', 'Promoting sustainable transport options', 12, 20000.00, 'EXTERNAL', 'PENDING', 10),
+    ('Wildlife Habitat Restoration', 'Restoring habitats for endangered species', 24, 60000.00, 'INTERNAL', 'ONGOING', 11),
+    ('Green Energy Development Project', 'Promoting renewable energy solutions', 18, 35000.00, 'EXTERNAL', 'APPROVED', 11),
+    ('Community Gardens Initiative', 'Creating communal spaces for sustainable gardening', 9, 15000.00, 'INTERNAL', 'ONGOING', 11),
+    ('Eco-tourism Promotion Program', 'Encouraging responsible tourism practices', 24, 40000.00, 'EXTERNAL', 'PENDING', 11),
+    ('Waste Recycling Campaign', 'Promoting waste reduction and recycling', 6, 10000.00, 'INTERNAL', 'ARCHIVED', 10),
     ('Green Buildings Certification Project', 'Promoting eco-friendly building standards', 36, 90000.00, 'EXTERNAL', 'APPROVED', 10),
     ('Climate Change Adaptation Strategy', 'Developing strategies for climate resilience', 24, 70000.00, 'INTERNAL', 'ONGOING', 10);
 
@@ -294,25 +294,26 @@ VALUES
 
 INSERT INTO projects.document_versions (version, document_id, project_id, file_path, author_id)
 VALUES
-    (0, 1, 1, 'C:\Users\Nina\OneDrive\Desktop\Projects\Conservation of Wetlands\conservation_plan_v0.pdf', 11), -- Conservation of Wetlands
-    (0, 2, 2, '/path/to/document2.pdf', 11), -- Reforestation Initiative
-    (0, 3, 3, '/path/to/document3.pdf', 11),  -- Urban Green Spaces Development
-    (0, 4, 4, '/path/to/document4.pdf', 11), -- River Cleanup Campaign
-    (0, 5, 5, '/path/to/document5.pdf', 11), -- Biodiversity Monitoring Program
-    (0, 6, 6, '/path/to/document6.pdf', 11), -- Sustainable Agriculture Project
-    (0, 7, 7, '/path/to/document7.pdf', 11), -- Ocean Conservation Initiative
-    (0, 8, 8, '/path/to/document8.pdf', 11), -- Eco-friendly Transportation Campaign
-    (0, 9, 9, '/path/to/document9.pdf', 10), -- Wildlife Habitat Restoration
-    (0, 10, 10, '/path/to/document10.pdf', 10), -- Green Energy Development Project
-    (0, 11, 11, '/path/to/document11.pdf', 10), -- Community Gardens Initiative
-    (0, 12, 12, '/path/to/document12.pdf', 10), -- Eco-tourism Promotion Program
+    (0, 1, 1, 'C:\Users\Nina\OneDrive\Desktop\Projects\Conservation of Wetlands\conservation_plan_v0.pdf', 10), -- Conservation of Wetlands
+    (1, 1, 1, 'C:\Users\Nina\OneDrive\Desktop\Projects\Conservation of Wetlands\conservation_plan_v1.pdf', 10), -- Conservation of Wetlands
+    (0, 2, 2, '/path/to/document2.pdf', 10), -- Reforestation Initiative
+    (0, 3, 3, '/path/to/document3.pdf', 10),  -- Urban Green Spaces Development
+    (0, 4, 4, '/path/to/document4.pdf', 10), -- River Cleanup Campaign
+    (0, 5, 5, '/path/to/document5.pdf', 10), -- Biodiversity Monitoring Program
+    (0, 6, 6, '/path/to/document6.pdf', 10), -- Sustainable Agriculture Project
+    (0, 7, 7, '/path/to/document7.pdf', 10), -- Ocean Conservation Initiative
+    (0, 8, 8, '/path/to/document8.pdf', 10), -- Eco-friendly Transportation Campaign
+    (0, 9, 9, '/path/to/document9.pdf', 11), -- Wildlife Habitat Restoration
+    (0, 10, 10, '/path/to/document10.pdf', 11), -- Green Energy Development Project
+    (0, 11, 11, '/path/to/document11.pdf', 11), -- Community Gardens Initiative
+    (0, 12, 12, '/path/to/document12.pdf', 11), -- Eco-tourism Promotion Program
     (0, 13, 13, '/path/to/document13.pdf', 10), -- Waste Recycling Campaign
     (0, 14, 14, '/path/to/document14.pdf', 10), -- Green Buildings Certification Project
     (0, 15, 15, '/path/to/document15.pdf', 10); -- Climate Change Adaptation Strategy
 
 INSERT INTO projects.next_versions (next_version, document_id, project_id)
 VALUES
-    (1, 1, 1), -- Conservation of Wetlands
+    (2, 1, 1), -- Conservation of Wetlands
     (1, 2, 2), -- Reforestation Initiative
     (1, 3, 3),  -- Urban Green Spaces Development
     (1, 4, 4), -- River Cleanup Campaign
@@ -331,7 +332,7 @@ VALUES
 INSERT INTO projects.team_members (project_id, user_id)
 VALUES
     -- Conservation of Wetlands
-    (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 12), (1, 13), (1, 14), (1, 15),
+    (1, 5), (1, 6), (1, 7), (1, 8), (1, 9), (1, 11), (1, 12), (1, 13), (1, 15),
     -- Reforestation Initiative
     (2, 5), (2, 6), (2, 7), (2, 8), (2, 9), (2, 12), (2, 13), (2, 14), (2, 15),
     -- Urban Green Spaces Development
@@ -364,10 +365,16 @@ VALUES
 INSERT INTO projects.assignments (document_id, project_id, user_id, task)
 VALUES
     -- Conservation of Wetlands
-    (1, 1, 5, 'WRITE'), (1, 1, 6, 'REVIEW'), (1, 1, 7, 'WRITE'), (1, 1, 8, 'REVIEW'),
-    (1, 1, 9, 'WRITE'), (1, 1, 12, 'REVIEW'), (1, 1, 13, 'WRITE'), (1, 1, 14, 'REVIEW'),
+    (1, 1, 13, 'WRITE'), (1, 1, 11, 'REVIEW'), (1, 1, 12, 'REVIEW'),
+    (2, 1, 13, 'WRITE'), (2, 1, 11, 'REVIEW'), (2, 1, 12, 'REVIEW'),
     -- Reforestation Initiative
     (1, 2, 5, 'WRITE'), (1, 2, 6, 'REVIEW'), (1, 2, 7, 'WRITE'), (1, 2, 8, 'REVIEW'),
     (1, 2, 9, 'WRITE'), (1, 2, 12, 'REVIEW'), (1, 2, 13, 'WRITE'), (1, 2, 14, 'REVIEW');
 
--- TODO add reviews
+INSERT INTO projects.review_requests (request_date, version, document_id, project_id, status, is_reviewed)
+VALUES
+    ('2024-05-20 10:00:00', 1, 1, 1, 'IN_PROGRESS', FALSE);
+
+INSERT INTO projects.reviews (review_date, request_id, reviewer_id, comment, is_approved)
+VALUES
+    ('2024-05-21 15:00:00', 1, 11, 'Looks good', TRUE);
