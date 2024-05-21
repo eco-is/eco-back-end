@@ -104,17 +104,17 @@ public class FixedExpensesController {
     public ResponseEntity<Page<FixedExpensesDto>> getAllFixedExpenses(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            // TODO period filter
+            @RequestParam(name = "sort", required = false, defaultValue = "type") String sortField,
+            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection,
+            @RequestParam(name = "period", required = false) String period,
             @RequestParam(name = "types", required = false) List<String> types,
             @RequestParam(name = "employees", required = false) List<Long> employees,
-            @RequestParam(name = "creators", required = false) List<Long> creators,
-            @RequestParam(name = "sort", required = false, defaultValue = "type") String sortField,
-            @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
+            @RequestParam(name = "creators", required = false) List<Long> creators
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(types, employees, creators, pageRequest);
+        var result = service.findAll(period, types, employees, creators, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 

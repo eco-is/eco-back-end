@@ -2,6 +2,7 @@ package com.eco.environet.finance.services.impl;
 
 import com.eco.environet.finance.dto.AccountantDto;
 import com.eco.environet.finance.model.OrganizationGoalStatus;
+import com.eco.environet.finance.repository.OrganizationGoalSpecifications;
 import com.eco.environet.finance.services.OrganizationGoalService;
 import com.eco.environet.users.model.User;
 import com.eco.environet.finance.dto.OrganizationGoalDto;
@@ -10,6 +11,7 @@ import com.eco.environet.finance.model.DateRange;
 import com.eco.environet.finance.model.OrganizationGoal;
 import com.eco.environet.finance.repository.OrganizationGoalRepository;
 import com.eco.environet.util.Mapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 public class OrganizationGoalServiceImpl implements OrganizationGoalService {
     @Value("${baseFrontUrl}")
     private String baseFrontUrl;
+    private final ObjectMapper objectMapper;
     private final OrganizationGoalRepository repository;
 
     @Override
@@ -54,14 +58,15 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
     }
 
     @Override
-    public Page<OrganizationGoalsSetDto> findAll(Pageable pageable) {
+    public Page<OrganizationGoalsSetDto> findAll(String title, String period, List<String> statuses, List<Long> creators, Pageable pageable) {
         // Increase pageSize by a factor of 5, because one set can have 3-5 goals
         Pageable adjustedPageable = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize() * 5,
                 pageable.getSort()
         );
-        Page<OrganizationGoal> allGoals = repository.findAll(adjustedPageable);
+        Specification<OrganizationGoal> spec = getSpecification(title, period, statuses, creators);
+        Page<OrganizationGoal> allGoals = repository.findAll(spec, adjustedPageable);
 
         // Group organization goals by their validity periods
         Map<DateRange, List<OrganizationGoal>> goalsByValidityPeriod = allGoals.getContent().stream()
@@ -90,8 +95,34 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
                     return 4;
             }
         }).thenComparing(set -> set.getValidPeriod().getStartDate(), Comparator.reverseOrder()));
-
-        return new PageImpl<>(goalsSets, pageable, allGoals.getTotalElements());
+        return new PageImpl<>(goalsSets, pageable, goalsSets.size());
+    }
+    private Specification<OrganizationGoal> getSpecification(String title, String period, List<String> statuses, List<Long> creators) {
+        DateRange dateRange = getDateRange(period);
+        return Specification.where(
+                OrganizationGoalSpecifications.titleLike(title))
+                .and(OrganizationGoalSpecifications.afterStartDate(dateRange))
+                .and(OrganizationGoalSpecifications.beforeEndDate(dateRange))
+                .and(OrganizationGoalSpecifications.statusIn(statuses))
+                .and(OrganizationGoalSpecifications.creatorIn(creators));
+    }
+    private DateRange getDateRange(String period) {
+        DateRange dateRange = new DateRange();
+        if (dateRange.getEndDate() == null){
+            dateRange.setStartDate(null);
+        }
+        if (period != null && !period.isEmpty() && !period.equals("undefined")) {
+            try {
+                dateRange = objectMapper.readValue(period, DateRange.class);
+            } catch (IOException e) {
+                // Handle the exception or throw a custom exception
+                throw new IllegalArgumentException("Invalid period format", e);
+            }
+        }
+        if (!dateRange.isValid()) {
+            throw new IllegalArgumentException("Invalid period " + period);
+        }
+        return dateRange;
     }
 
     @Override

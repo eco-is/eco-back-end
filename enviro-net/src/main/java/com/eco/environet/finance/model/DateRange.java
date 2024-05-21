@@ -29,6 +29,9 @@ public class DateRange {
         return startDate.isAfter(currentDate) && endDate.isAfter(currentDate);
     }
     public boolean isValid() {
+        if (startDate == null && endDate != null) {
+            return true; // dateRange filter
+        }
         if (endDate == null) {
             return true; // Goal is ongoing
         } else {
@@ -37,7 +40,6 @@ public class DateRange {
     }
 
     public long getDurationInDays() {
-        //return ChronoUnit.DAYS.between(startDate, endDate);
         LocalDate endDateToUse = endDate != null ? endDate : LocalDate.now();
         return ChronoUnit.DAYS.between(startDate, endDateToUse);
     }

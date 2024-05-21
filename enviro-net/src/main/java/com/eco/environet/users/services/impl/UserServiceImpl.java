@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -128,6 +129,26 @@ public class UserServiceImpl implements UserService {
         }
 
         return memberDtos;
+    }
+
+    @Override
+    public List<UserDto> findAllUsersByRoles(List<String> roles) {
+        List<Role> userRoles = getRoles(roles);
+        List<User> users = userRepository.findAllUsersByRoles(userRoles);
+        return Mapper.mapList(users, UserDto.class);
+    }
+    private List<Role> getRoles(List<String> roles) {
+        List<Role> userRoles = new ArrayList<>();
+        for(String role : roles){
+            Role userRole;
+            try {
+                userRole = Role.valueOf(role);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid role provided: " + role);
+            }
+            userRoles.add(userRole);
+        }
+        return userRoles;
     }
 
     @Override

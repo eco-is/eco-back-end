@@ -18,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/goal")
 @RequiredArgsConstructor
@@ -69,13 +71,17 @@ public class OrganizationGoalController {
     public ResponseEntity<Page<OrganizationGoalsSetDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "period", required = false) String period,
+            @RequestParam(name = "statuses", required = false) List<String> statuses,
+            @RequestParam(name = "creators", required = false) List<Long> creators,
             @RequestParam(name = "sort", required = false, defaultValue = "validPeriod.startDate") String sortField,
             @RequestParam(name = "direction", required = false, defaultValue = "desc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(pageRequest);
+        var result = service.findAll(title, period, statuses, creators, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
