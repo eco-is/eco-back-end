@@ -304,6 +304,32 @@ VALUES
     (8, 'ARCHIVED', 'air quality monitoring program', '2022-01-01', '2023-01-01', 'Aims to establish a comprehensive air quality monitoring program to track air pollution levels, identify sources of pollution, and inform policy decisions and public health interventions.', 'Organization seeks to improve air quality, protect public health, and raise awareness about the impacts of air pollution on human health and the environment through data-driven analysis and targeted interventions.', 1),
     (8, 'ARCHIVED', 'green infrastructure development', '2022-01-01', '2023-01-01', 'Focuses on planning, designing, and implementing green infrastructure projects such as urban parks, green roofs, and permeable pavement to enhance ecosystem services, mitigate urban heat island effects, and promote climate resilience.', 'Organization aims to create sustainable and resilient communities by integrating green infrastructure into urban planning and development processes, enhancing quality of life and environmental sustainability.', 1);
 
+INSERT INTO finance.revenues
+    (created_on, type, amount)
+VALUES
+    ('2024-01-12 12:00:00.000', 'DONATION', 120),
+    ('2024-02-12 12:00:00.000', 'DONATION', 150),
+    ('2024-02-13 12:00:00.000', 'DONATION', 20),
+    ('2024-02-14 12:00:00.000', 'DONATION', 320),
+    ('2024-03-15 12:00:00.000', 'DONATION', 50),
+
+    ('2024-01-01 12:00:00.000', 'PROJECT_REVENUE', 15200),
+    ('2024-02-07 12:00:00.000', 'PROJECT_REVENUE', 20000),
+    ('2023-03-12 12:00:00.000', 'PROJECT_REVENUE', 2000),
+    ('2024-04-01 12:00:00.000', 'PROJECT_REVENUE', 15000),
+    ('2024-02-02 12:00:00.000', 'PROJECT_REVENUE', 12000),
+
+    ('2024-03-03 12:00:00.000', 'PROJECT_DONATION', 120),
+    ('2024-02-05 12:00:00.000', 'PROJECT_DONATION', 500),
+    ('2024-01-16 12:00:00.000', 'PROJECT_DONATION', 700),
+    ('2024-01-06 12:00:00.000', 'PROJECT_DONATION', 400),
+    ('2024-01-15 12:00:00.000', 'PROJECT_DONATION', 120),
+
+    ('2024-01-04 12:00:00.000', 'LECTURE_DONATION', 250),
+    ('2024-01-04 12:00:00.000', 'LECTURE_DONATION', 100),
+    ('2024-01-04 12:00:00.000', 'LECTURE_REVENUE', 1200),
+    ('2024-01-04 12:00:00.000', 'LECTURE_REVENUE', 120);
+
 -- Projects
 INSERT INTO projects.projects (name, description, duration_months, budget, type, status, manager_id)
 VALUES
