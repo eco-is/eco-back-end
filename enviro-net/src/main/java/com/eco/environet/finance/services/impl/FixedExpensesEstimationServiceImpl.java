@@ -179,7 +179,7 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
             // SALARY update
             estimation.setDescription(fixedExpensesEstimationDto.getFixedExpense().getDescription());
             estimation.setOvertimeHours(fixedExpensesEstimationDto.getFixedExpense().getOvertimeHours());
-            // asmount update
+            // amount update
             var employee = new OrganizationMember(
                     null,
                     fixedExpensesEstimationDto.getFixedExpense().getEmployee().getWage(),
