@@ -55,24 +55,24 @@ public class RevenueServiceImpl implements RevenueService {
     }
 
     @Override
-    public Page<RevenueDto> findAll(List<String> types, String startDate, String endDate, double amountAbove, double amountBellow, Pageable pageable) {
-        Specification<Revenue> spec = getSpecification(types, startDate, endDate, amountAbove, amountBellow);
+    public Page<RevenueDto> findAll(List<String> types, String startDate, String endDate, double amountAbove, double amountBelow, Pageable pageable) {
+        Specification<Revenue> spec = getSpecification(types, startDate, endDate, amountAbove, amountBelow);
         Page<Revenue> all = repository.findAll(spec, pageable);
         return Mapper.mapPage(all, RevenueDto.class);
     }
-    private Specification<Revenue> getSpecification(List<String> types, String startDate, String endDate, double amountAbove, double amountBellow){
+    private Specification<Revenue> getSpecification(List<String> types, String startDate, String endDate, double amountAbove, double amountBelow){
         List<RevenueType> typeList = getTypesList(types);
         Timestamp startTimestamp = getDate(startDate);
         Timestamp endTimestamp = getDate(endDate);
         validateDates(startTimestamp, endTimestamp);
-        validateAmount(amountAbove, amountBellow);
+        validateAmount(amountAbove, amountBelow);
 
         return Specification.where(
-                typeList.isEmpty() ? null : RevenueSpecifications.typeIn(typeList))
+                     typeList == null ? null : RevenueSpecifications.typeIn(typeList))
                 .and(RevenueSpecifications.afterDate(startTimestamp))
                 .and(RevenueSpecifications.beforeDate(endTimestamp))
-                .and(RevenueSpecifications.amountAbove(amountAbove))
-                .and(RevenueSpecifications.amountBellow(amountBellow));
+                .and(amountAbove <= 0 ? null : (RevenueSpecifications.amountAbove(amountAbove)))
+                .and(amountBelow <= 0 ? null : (RevenueSpecifications.amountBelow(amountBelow)));
     }
     private List<RevenueType> getTypesList(List<String> typesString){
         if (typesString == null || typesString.isEmpty()){
@@ -85,9 +85,9 @@ public class RevenueServiceImpl implements RevenueService {
         }
         return result;
     }
-    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     public static Timestamp getDate(String date) {
-        if (date == null || date.isEmpty()) {
+        if (date == null || date.isEmpty() || date.equals("undefined")) {
             return null;
         }
 
@@ -118,7 +118,10 @@ public class RevenueServiceImpl implements RevenueService {
         }
     }
     private void validateAmount(double amountAbove, double amountBellow) {
-        if (amountBellow < amountAbove){
+        if (amountAbove < 0 || amountBellow < 0) {
+            throw new IllegalArgumentException("Invalid amount range, must be > 0: [from: " + amountAbove + " \nto: " + amountBellow);
+        }
+        if (amountBellow < amountAbove && amountBellow != 0){
             throw new IllegalArgumentException("Invalid amount range [from: " + amountAbove + " \nto: " + amountBellow);
         }
     }

@@ -64,7 +64,7 @@ public class RevenueController {
                     content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)})
-    @GetMapping(value="/get-budget/{id}")
+    @GetMapping(value="/get/{id}")
     @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
     public ResponseEntity<RevenueDto> getRevenue(@PathVariable Long id){
         var result = service.findById(id);
@@ -95,15 +95,15 @@ public class RevenueController {
             @RequestParam(name = "types", required = false) List<String> types,
             @RequestParam(name = "startDate", required = false) String startDate,
             @RequestParam(name = "endDate", required = false) String endDate,
-            @RequestParam(name = "aboveAmount", required = false) double aboveAmount,
-            @RequestParam(name = "bellowAmount", required = false) double bellowAmount,
+            @RequestParam(name = "aboveAmount", required = false, defaultValue = "0") Double aboveAmount,
+            @RequestParam(name = "belowAmount", required = false, defaultValue = "0") Double belowAmount,
             @RequestParam(name = "sort", required = false, defaultValue = "type") String sortField,
             @RequestParam(name = "direction", required = false, defaultValue = "asc") String sortDirection
     ) {
         Sort sort = Sort.by(sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortField);
         PageRequest pageRequest = PageRequest.of(page, size, sort);
 
-        var result = service.findAll(types, startDate, endDate, aboveAmount, bellowAmount, pageRequest);
+        var result = service.findAll(types, startDate, endDate, aboveAmount, belowAmount, pageRequest);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
