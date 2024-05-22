@@ -1,6 +1,7 @@
 package com.eco.environet.finance.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,6 @@ import java.time.Instant;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Inheritance(strategy = InheritanceType.JOINED)
 @Builder(builderMethodName = "revenueBuilder")
 @Table(name="revenues", schema = "finance")
@@ -30,6 +30,7 @@ public class Revenue {
     @Column(name = "type", nullable = false)
     private RevenueType type = RevenueType.DONATION;
 
+    @Min(value = 0, message = "Amount must be greater than 0")
     @Column(name = "amount", nullable = false)
     private double amount = 100;
 }

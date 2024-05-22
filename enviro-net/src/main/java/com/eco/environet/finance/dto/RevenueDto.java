@@ -1,5 +1,7 @@
 package com.eco.environet.finance.dto;
 
+import com.eco.environet.projects.dto.ProjectDto;
+import com.eco.environet.users.dto.UserContactDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -28,7 +30,7 @@ public class RevenueDto {
     @Positive(message = "Amount must be a positive number")
     private double amount;
 
-//    private Project project;
-//    private EmployeeDto donator;
+    private UserContactDto donator;
+    private ProjectDto project;
 //    private Lecture lecture;
 }

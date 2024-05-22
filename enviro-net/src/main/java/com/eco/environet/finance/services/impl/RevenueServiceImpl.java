@@ -2,11 +2,15 @@ package com.eco.environet.finance.services.impl;
 
 import com.eco.environet.finance.dto.RevenueDto;
 import com.eco.environet.finance.model.*;
-import com.eco.environet.finance.repository.RevenueSpecifications;
-import com.eco.environet.finance.repository.RevenueRepository;
+import com.eco.environet.finance.repository.*;
 import com.eco.environet.finance.services.RevenueService;
+import com.eco.environet.projects.dto.ProjectDto;
+import com.eco.environet.projects.model.Project;
+import com.eco.environet.projects.repository.ProjectRepository;
+import com.eco.environet.users.dto.UserContactDto;
+import com.eco.environet.users.model.User;
+import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.Mapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +30,12 @@ import java.util.List;
 public class RevenueServiceImpl implements RevenueService {
     @Value("${baseFrontUrl}")
     private String baseFrontUrl;
-    private final ObjectMapper objectMapper;
     private final RevenueRepository repository;
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final DonationRepository donationRepository;
+    private final ProjectDonationRepository projectDonationRepository;
+    private final ProjectRevenueRepository projectRevenueRepository;
 
     @Override
     public RevenueDto create(RevenueDto newRevenue) {
@@ -37,12 +45,49 @@ public class RevenueServiceImpl implements RevenueService {
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid type provided: " + newRevenue.getType());
         }
-
         Revenue revenue = Revenue.revenueBuilder()
                 .createdOn(new Timestamp(System.currentTimeMillis()))
                 .type(revenueType)
                 .amount(newRevenue.getAmount())
                 .build();
+
+        if (RevenueType.getAllDonations().contains(revenue.getType())) {
+            User donator = userRepository.findById(newRevenue.getDonator().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Donator not found with ID: " + newRevenue.getDonator().getId()));
+            Donation newDonation = new Donation(revenue);
+            newDonation.setDonator(donator);
+            if (revenue.getType() == RevenueType.DONATION){
+                donationRepository.save(newDonation);
+                RevenueDto dto = Mapper.map(revenue, RevenueDto.class);
+                dto.setDonator(new UserContactDto(donator));
+                return dto;
+            }
+            if (revenue.getType() == RevenueType.PROJECT_DONATION) {
+                ProjectDonation newProjectDonation = new ProjectDonation(newDonation);
+                // TODO is it allowed to use projectRepository here?
+                Project project = projectRepository.findById(newRevenue.getProject().getId())
+                        .orElseThrow(() -> new EntityNotFoundException("Project not found with ID: " + newRevenue.getProject().getId()));
+                newProjectDonation.setProject(project);
+                projectDonationRepository.save(newProjectDonation);
+                RevenueDto dto = Mapper.map(revenue, RevenueDto.class);
+                dto.setDonator(new UserContactDto(donator));
+                dto.setProject(Mapper.map(newProjectDonation.getProject(), ProjectDto.class));
+                return dto;
+            }
+            // TODO if (revenue.getType() == RevenueType.LECTURE_DONATION){}
+        }
+        if (revenue.getType() == RevenueType.PROJECT_REVENUE) {
+            // TODO is it allowed to use projectRepository here?
+            Project project = projectRepository.findById(newRevenue.getProject().getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Project not found with ID: " + newRevenue.getProject().getId()));
+            ProjectRevenue newProjectRevenue = new ProjectRevenue(revenue);
+            newProjectRevenue.setProject(project);
+            projectRevenueRepository.save(newProjectRevenue);
+            RevenueDto dto = Mapper.map(revenue, RevenueDto.class);
+            dto.setProject(Mapper.map(newProjectRevenue.getProject(), ProjectDto.class));
+            return dto;
+        }
+
         repository.save(revenue);
         return Mapper.map(revenue, RevenueDto.class);
     }
