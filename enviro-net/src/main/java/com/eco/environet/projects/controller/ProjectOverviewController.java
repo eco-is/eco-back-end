@@ -59,7 +59,6 @@ public class ProjectOverviewController {
         return ResponseEntity.ok(result);
     }
 
-
     @Operation(summary = "Fetch documents by project")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fetched documents by project", content = @Content(mediaType = "application/json")),

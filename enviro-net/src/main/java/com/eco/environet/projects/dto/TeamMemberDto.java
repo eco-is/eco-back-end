@@ -1,6 +1,5 @@
 package com.eco.environet.projects.dto;
 
-import com.eco.environet.users.model.Role;
 import lombok.Data;
 
 @Data

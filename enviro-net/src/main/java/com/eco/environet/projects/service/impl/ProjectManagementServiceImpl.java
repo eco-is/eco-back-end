@@ -1,8 +1,9 @@
 package com.eco.environet.projects.service.impl;
 
-import com.eco.environet.projects.dto.*;
+import com.eco.environet.projects.dto.ProjectCreationDto;
+import com.eco.environet.projects.dto.ProjectDto;
+import com.eco.environet.projects.dto.ProjectUpdateDto;
 import com.eco.environet.projects.model.*;
-import com.eco.environet.projects.model.id.DocumentId;
 import com.eco.environet.projects.repository.DocumentRepository;
 import com.eco.environet.projects.repository.DocumentVersionRepository;
 import com.eco.environet.projects.repository.ProjectRepository;
@@ -15,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -91,7 +88,7 @@ public class ProjectManagementServiceImpl implements ProjectManagementService {
 
         if (project.getStatus() == Status.DRAFT) {
             projectRepository.delete(project);
-        } else  if (project.getStatus() == Status.ONGOING){
+        } else if (project.getStatus() == Status.ONGOING) {
             project.setStatus(Status.ARCHIVED);
             projectRepository.save(project);
         } else {

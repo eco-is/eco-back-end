@@ -26,6 +26,9 @@ public class Assignment {
     @Column(nullable = false)
     private Task task;
 
+    @Column(nullable = false)
+    private Boolean active;
+
     public static Assignment createAssignment(Document document, TeamMember teamMember, Task task) {
         if (!document.getProjectId().equals(teamMember.getProjectId())) {
             throw new IllegalArgumentException("Document and Team Member do not belong to the same project");
@@ -36,7 +39,7 @@ public class Assignment {
         assignment.setProjectId(document.getProjectId());
         assignment.setUserId(teamMember.getUserId());
         assignment.setTask(task);
-
+        assignment.setActive(true);
         return assignment;
     }
 }
