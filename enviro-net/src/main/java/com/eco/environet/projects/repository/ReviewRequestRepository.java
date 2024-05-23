@@ -3,7 +3,6 @@ package com.eco.environet.projects.repository;
 import com.eco.environet.projects.model.ReviewRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,7 +26,13 @@ public interface ReviewRequestRepository extends JpaRepository<ReviewRequest, Lo
             "   AND ass.documentId = req.documentVersion.documentId" +
             "   AND ass.task = 'REVIEW'" +
             ")")
-    List<ReviewRequest> findUnreviewedByReviewer(@Param("userId") Long userId);
+    List<ReviewRequest> findUnreviewedByReviewer(Long userId);
+
+    @Query("SELECT r " +
+            "FROM ReviewRequest r " +
+            "WHERE r.documentVersion.projectId = :projectId" +
+            " AND r.documentVersion.documentId = :documentId")
+    List<ReviewRequest> findAllByDocument(Long projectId, Long documentId);
 
     @Query("SELECT r " +
             "FROM ReviewRequest r " +

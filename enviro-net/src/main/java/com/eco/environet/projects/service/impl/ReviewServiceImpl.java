@@ -2,6 +2,7 @@ package com.eco.environet.projects.service.impl;
 
 import com.eco.environet.projects.dto.DocumentReviewCreationDto;
 import com.eco.environet.projects.dto.DocumentReviewDto;
+import com.eco.environet.projects.dto.DocumentReviewStatusDto;
 import com.eco.environet.projects.dto.DocumentTaskDto;
 import com.eco.environet.projects.model.*;
 import com.eco.environet.projects.model.id.DocumentVersionId;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @RequiredArgsConstructor
 @Transactional
@@ -45,13 +47,27 @@ public class ReviewServiceImpl implements ReviewService {
         List<Review> reviews = reviewRepository.findAllByDocument(projectId, documentId);
         List<DocumentReviewDto> reviewDtos = Mapper.mapList(reviews, DocumentReviewDto.class);
 
-        reviewDtos.forEach(reviewDto -> userRepository.findById(reviewDto.getReviewer().getUserId())
-                .ifPresent(reviewer -> {
-                    reviewDto.getReviewer().setFirstName(reviewer.getName());
-                    reviewDto.getReviewer().setLastName(reviewer.getSurname());
-                })
-        );
+        IntStream.range(0, reviews.size())
+                .forEach(i -> {
+                    reviewDtos.get(i).setVersion(reviews.get(i).getRequest().getDocumentVersion().getVersion());
+                    reviewDtos.get(i).getReviewer().setFirstName(reviews.get(i).getReviewer().getName());
+                    reviewDtos.get(i).getReviewer().setLastName(reviews.get(i).getReviewer().getSurname());
+                });
+
         return reviewDtos;
+    }
+
+    @Override
+    public List<DocumentReviewStatusDto> getDocumentReviewStatuses(Long projectId, Long documentId) {
+        List<ReviewRequest> requests = requestRepository.findAllByDocument(projectId, documentId);
+        List<DocumentReviewStatusDto> requestDtos = Mapper.mapList(requests, DocumentReviewStatusDto.class);
+
+        IntStream.range(0, requests.size())
+                .forEach(i ->
+                        requestDtos.get(i).setVersion(requests.get(i).getDocumentVersion().getVersion())
+                );
+
+        return requestDtos;
     }
 
     public List<DocumentTaskDto> getUnreviewedDocuments(Long userId) {

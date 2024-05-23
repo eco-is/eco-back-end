@@ -126,7 +126,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 
     @Override
     public List<DocumentTaskDto> getAssignedDocuments(Long userId) {
-        List<Assignment> assignments = assignmentRepository.findByUser(userId);
+        List<Assignment> assignments = assignmentRepository.findActiveByUser(userId);
 
         return assignments.stream()
                 .map(assignment -> {
@@ -152,6 +152,11 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
 
         return Optional.of(resource)
                 .orElseThrow(() -> new FileNotFoundException("File not found " + documentVersion.getFilePath()));
+    }
+
+    @Override
+    public Task getAssignment(Long projectId, Long documentId, Long userId) {
+        return assignmentRepository.findByDocumentAndUser(documentId, projectId, userId);
     }
 
     private void updateProgress(DocumentUploadDto documentDto, Document document) {

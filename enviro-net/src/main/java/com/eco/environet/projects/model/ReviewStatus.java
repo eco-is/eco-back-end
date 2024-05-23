@@ -4,5 +4,15 @@ public enum ReviewStatus {
     REQUESTED,
     IN_PROGRESS,
     APPROVED,
-    REJECTED
+    REJECTED;
+
+    @Override
+    public String toString() {
+        return switch (this) {
+            case REQUESTED -> "Requested";
+            case IN_PROGRESS -> "In Progress";
+            case APPROVED -> "Approved";
+            case REJECTED -> "Rejected";
+        };
+    }
 }

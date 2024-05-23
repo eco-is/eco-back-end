@@ -18,16 +18,16 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Assignme
     @Query("SELECT a FROM Assignment a WHERE a.documentId = :documentId AND a.projectId = :projectId AND a.task = :task")
     List<Assignment> findByDocumentAndTask(Long documentId, Long projectId, Task task);
 
-    @Query("SELECT a FROM Assignment a WHERE a.userId = :userId")
-    List<Assignment> findByUser(Long userId);
+    @Query("SELECT a FROM Assignment a WHERE a.userId = :userId and a.active = true")
+    List<Assignment> findActiveByUser(Long userId);
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
             "FROM Assignment a " +
             "WHERE a.documentId = :documentId AND a.projectId = :projectId AND a.userId = :userId AND a.task = 'WRITE'")
     Boolean isWriter(Long documentId, Long projectId, Long userId);
 
-    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
+    @Query("SELECT a.task " +
             "FROM Assignment a " +
-            "WHERE a.documentId = :documentId AND a.projectId = :projectId AND a.userId = :userId AND a.task = 'REVIEW'")
-    Boolean isReviewer(Long documentId, Long projectId, Long userId);
+            "WHERE a.documentId = :documentId AND a.projectId = :projectId AND a.userId = :userId")
+    Task findByDocumentAndUser(Long documentId, Long projectId, Long userId);
 }

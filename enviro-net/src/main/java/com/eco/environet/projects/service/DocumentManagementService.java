@@ -1,6 +1,7 @@
 package com.eco.environet.projects.service;
 
 import com.eco.environet.projects.dto.*;
+import com.eco.environet.projects.model.Task;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
@@ -16,4 +17,5 @@ public interface DocumentManagementService {
     DocumentVersionsDto getDocumentVersions(Long projectId, Long documentId);
     List<DocumentTaskDto> getAssignedDocuments(Long userId);
     Resource getDocumentFile(Long projectId, Long documentId, Long version) throws IOException;
+    Task getAssignment(Long projectId, Long documentId, Long userId);
 }

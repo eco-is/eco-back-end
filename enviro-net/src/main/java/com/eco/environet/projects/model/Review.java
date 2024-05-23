@@ -30,7 +30,7 @@ public class Review {
     @JoinColumn(name = "reviewer_id", referencedColumnName = "id")
     private User reviewer;
 
-    @Column
+    @Column(length = 500)
     private String comment;
 
     @Column(name = "is_approved", nullable = false)

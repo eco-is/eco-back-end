@@ -2,6 +2,7 @@ package com.eco.environet.projects.controller;
 
 import com.eco.environet.projects.dto.DocumentReviewCreationDto;
 import com.eco.environet.projects.dto.DocumentReviewDto;
+import com.eco.environet.projects.dto.DocumentReviewStatusDto;
 import com.eco.environet.projects.dto.DocumentTaskDto;
 import com.eco.environet.projects.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,27 +40,38 @@ public class ReviewController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Request document version review")
+    @Operation(summary = "Fetch document reviews")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Review requested", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Document reviews fetched", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
     })
-    @PostMapping("/{projectId}/documents/{documentId}/reviews")
+    @GetMapping("/{projectId}/documents/{documentId}/reviews")
     @PreAuthorize("authentication.principal.role.isOrganizationMember() and @teamMemberRepository.isOnTeam(#projectId, authentication.principal.id)")
     public ResponseEntity<List<DocumentReviewDto>> getDocumentReviews(@PathVariable Long projectId, @PathVariable Long documentId) {
         List<DocumentReviewDto> result = reviewService.getDocumentReviews(projectId, documentId);
         return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Fetch document versions pending request")
+    @Operation(summary = "Fetch document reviews statuses")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Documnets versions fetched", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "200", description = "Document reviews statuses fetched", content = @Content(mediaType = "application/json")),
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
     })
-    @PostMapping("/assignments/unreviewed")
+    @GetMapping("/{projectId}/documents/{documentId}/reviews/status")
+    @PreAuthorize("authentication.principal.role.isOrganizationMember() and @teamMemberRepository.isOnTeam(#projectId, authentication.principal.id)")
+    public ResponseEntity<List<DocumentReviewStatusDto>> getDocumentRequestStatuses(@PathVariable Long projectId, @PathVariable Long documentId) {
+        List<DocumentReviewStatusDto> result = reviewService.getDocumentReviewStatuses(projectId, documentId);
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Fetch document versions pending request")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Documents versions fetched", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
+    })
+    @GetMapping("/assignments/unreviewed")
     @PreAuthorize("authentication.principal.role.isOrganizationMember() and #userId == authentication.principal.id")
-    public ResponseEntity<List<DocumentTaskDto>> getUnreviewedDocuments(@RequestParam Long userId)
-    {
+    public ResponseEntity<List<DocumentTaskDto>> getUnreviewedDocuments(@RequestParam Long userId) {
         List<DocumentTaskDto> result = reviewService.getUnreviewedDocuments(userId);
         return ResponseEntity.ok(result);
     }
