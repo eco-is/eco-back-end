@@ -17,7 +17,7 @@ VALUES ('Conservation of Wetlands', 'Protecting and restoring wetland ecosystems
        ('Eco-friendly Transportation Campaign', 'Promoting sustainable transport options', 12, 20000.00, 'EXTERNAL',
         'PENDING', 10, '["green transport", "sustainability", "clean air", "green city"]'),
        ('Wildlife Habitat Restoration', 'Restoring habitats for endangered species', 24, 60000.00, 'INTERNAL',
-        'ONGOING', 11, '["nature", "habitat", "wildlife". "restore"]'),
+        'ONGOING', 11, '["nature", "habitat", "wildlife", "restore"]'),
        ('Green Energy Development Project', 'Promoting renewable energy solutions', 18, 35000.00, 'EXTERNAL',
         'APPROVED', 11, '["protect nature", "green knowledge", "green energy", "renewable", "clean air", "green city"]'),
        ('Community Gardens Initiative', 'Creating communal spaces for sustainable gardening', 9, 15000.00, 'INTERNAL',
