@@ -1,33 +1,34 @@
+-- currently valid organization goals: nature, green knowledge, green energy, clean air, green city
 -- Projects
-INSERT INTO projects.projects (name, description, duration_months, budget, type, status, manager_id)
+INSERT INTO projects.projects (name, description, duration_months, budget, type, status, manager_id, tags)
 VALUES ('Conservation of Wetlands', 'Protecting and restoring wetland ecosystems', 24, 50000.00, 'INTERNAL', 'DRAFT',
-        10),
+        10, '["nature", "wildlife", "water", "green energy"]'),
        ('Reforestation Initiative', 'Planting trees and restoring forest habitats', 18, 30000.00, 'EXTERNAL', 'PENDING',
-        10),
+        10, '["restore", "green knowledge", "greener future", "clean air", "trees", "forests"]'),
        ('Urban Green Spaces Development', 'Creating parks and green areas in urban settings', 12, 25000.00, 'INTERNAL',
-        'APPROVED', 10),
-       ('River Cleanup Campaign', 'Cleaning up polluted rivers and waterways', 6, 10000.00, 'EXTERNAL', 'ONGOING', 10),
+        'APPROVED', 10, '["green development", "urban", "parks", "green city"]'),
+       ('River Cleanup Campaign', 'Cleaning up polluted rivers and waterways', 6, 10000.00, 'EXTERNAL', 'ONGOING', 10, '["nature", "water", "pollution", "clean water"]'),
        ('Biodiversity Monitoring Program', 'Monitoring and preserving local biodiversity', 36, 75000.00, 'INTERNAL',
-        'REJECTED', 10),
+        'REJECTED', 10, '["biodiversity", "conservation"]'),
        ('Sustainable Agriculture Project', 'Promoting eco-friendly farming practices', 24, 60000.00, 'EXTERNAL',
-        'ARCHIVED', 10),
+        'ARCHIVED', 10, '["green knowledge", "farming", "sustainability", "green agriculture"]'),
        ('Ocean Conservation Initiative', 'Protecting marine life and habitats', 36, 80000.00, 'INTERNAL', 'ONGOING',
-        10),
+        10, '["ocean", "marine", "green knowledge", "conservation", "ocean protection"]'),
        ('Eco-friendly Transportation Campaign', 'Promoting sustainable transport options', 12, 20000.00, 'EXTERNAL',
-        'PENDING', 10),
+        'PENDING', 10, '["green transport", "sustainability", "clean air", "green city"]'),
        ('Wildlife Habitat Restoration', 'Restoring habitats for endangered species', 24, 60000.00, 'INTERNAL',
-        'ONGOING', 11),
+        'ONGOING', 11, '["nature", "habitat", "wildlife". "restore"]'),
        ('Green Energy Development Project', 'Promoting renewable energy solutions', 18, 35000.00, 'EXTERNAL',
-        'APPROVED', 11),
+        'APPROVED', 11, '["protect nature", "green knowledge", "green energy", "renewable", "clean air", "green city"]'),
        ('Community Gardens Initiative', 'Creating communal spaces for sustainable gardening', 9, 15000.00, 'INTERNAL',
-        'ONGOING', 11),
+        'ONGOING', 11, '["nature", "gardens", "community", "green space", "green city"]'),
        ('Eco-tourism Promotion Program', 'Encouraging responsible tourism practices', 24, 40000.00, 'EXTERNAL',
-        'PENDING', 11),
-       ('Waste Recycling Campaign', 'Promoting waste reduction and recycling', 6, 10000.00, 'INTERNAL', 'ARCHIVED', 10),
+        'PENDING', 11, '["adapt to nature", "tourism", "responsible"]'),
+       ('Waste Recycling Campaign', 'Promoting waste reduction and recycling', 6, 10000.00, 'INTERNAL', 'ARCHIVED', 10, '["nature", "recycling", "waste", "green city", "green future"]'),
        ('Green Buildings Certification Project', 'Promoting eco-friendly building standards', 36, 90000.00, 'EXTERNAL',
-        'APPROVED', 10),
+        'APPROVED', 10, '["build green", "green certification", "green city"]'),
        ('Climate Change Adaptation Strategy', 'Developing strategies for climate resilience', 24, 70000.00, 'INTERNAL',
-        'ONGOING', 10);
+        'ONGOING', 10, '["climate", "resilience", "green knowledge", "green energy", "clean air", "green city"]');
 
 INSERT INTO projects.documents (document_id, project_id, name, progress, status)
 VALUES (1, 1, 'Conservation Plan', 0.25, 'In Progress - less than halfway'),        -- Conservation of Wetlands
