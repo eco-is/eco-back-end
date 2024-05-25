@@ -1,11 +1,14 @@
 package com.eco.environet.projects.model;
 
 import com.eco.environet.users.model.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -43,4 +46,10 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "manager_id", referencedColumnName = "id")
     private User manager;
+
+
+    @Column(name = "tags", columnDefinition = "json")
+    @Convert(converter = StringListConverter.class)
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private List<String> tags;
 }
