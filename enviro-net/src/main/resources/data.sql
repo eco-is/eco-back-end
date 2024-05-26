@@ -17,6 +17,24 @@ VALUES
     ('marijamarijanovic@gmail.com', false, 'Marija', 'Marijanović', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245678', 'marija.m', 'EDUCATOR', true, '1986-09-07', 'FEMALE'),
     ('ljubabuba@gmail.com', true, 'Ljubica', 'Atić', null, '$2a$10$siTymq2.Fp0J/K6vnBernO/vOXAHUXa4BCRFp14yoJvJbvE8qckGW', '+38763245123', 'ljubica.a', 'EDUCATOR', true, '1994-03-12', 'FEMALE');
 
+INSERT INTO users.notifications (user_id, is_read, created_on, title, description, link)
+VALUES
+    (2, false, '2024-05-26 08:00:00.000', 'Welcome to our platform!', 'Thank you for joining us.', null),
+    (2, true, '2024-05-26 08:30:00.000', 'New Feature Announcement', 'Exciting news! We''ve just released a new feature. Check it out!', null),
+    (3, false, '2024-05-26 09:30:00.000', 'Important Announcement', 'Please read the latest update on our website.', null),
+    (4, true, '2024-05-26 09:50:00.000', 'Holiday Closure Notice', 'Please note that our office will be closed for the upcoming holiday.', null),
+    (5, false, '2024-05-26 10:45:00.000', 'Account Activation', 'Your account has been successfully activated.', null),
+    (6, false, '2024-05-26 11:00:00.000', 'Account Verification Required', 'Action required: Please verify your email address to complete your account setup.', null),
+    (7, false, '2024-05-26 11:20:00.000', 'Reminder: Upcoming Event', 'Don''t forget about the upcoming event tomorrow.', null),
+    (8, true, '2024-05-26 12:40:00.000', 'Congratulations!', 'You''ve reached a new milestone. Keep up the great work!', null),
+    (9, false, '2024-05-26 12:15:00.000', 'Project Update', 'Check out the latest progress report for the project.', null),
+    (10, false, '2024-05-26 13:45:00.000', 'Survey Invitation', 'We value your opinion. Please take a moment to complete our survey.', null),
+    (11, false, '2024-05-26 13:30:00.000', 'Training Session Reminder', 'Reminder: Training session scheduled for next week.', null),
+    (12, false, '2024-05-26 14:00:00.000', 'Maintenance Scheduled', 'Important notice: Maintenance activity is scheduled for later this week. Stay tuned for updates.', null),
+    (13, false, '2024-05-26 14:45:00.000', 'New Assignment', 'You have been assigned a new task. Please review it.', null),
+    (14, true, '2024-05-26 15:30:00.000', 'Task Completed', 'Your task has been successfully completed. Well done!', null),
+    (15, false, '2024-05-26 15:20:00.000', 'Feedback Request', 'We would appreciate your feedback on our services.', null);
+
 -- Education
 INSERT INTO education.lecture_category (description)
 VALUES
