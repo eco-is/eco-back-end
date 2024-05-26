@@ -31,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
     public List<NotificationDto> findAllByUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-        List<Notification> result = repository.findAllByUserOrderByIsReadDesc(user);
+        List<Notification> result = repository.findAllByUserOrderByIsReadAsc(user);
         return Mapper.mapList(result, NotificationDto.class);
     }
 
