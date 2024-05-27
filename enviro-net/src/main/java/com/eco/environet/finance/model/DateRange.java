@@ -20,8 +20,7 @@ public class DateRange {
 
     @Override
     public String toString() {
-        return "DateRange[startDate=" + startDate +
-                       ", endDate=" + endDate + "]";
+        return startDate + "  -  " + endDate;
     }
 
     public boolean isInFuture() {

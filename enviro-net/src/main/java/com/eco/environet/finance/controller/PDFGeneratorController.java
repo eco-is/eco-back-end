@@ -1,0 +1,53 @@
+package com.eco.environet.finance.controller;
+
+import java.io.IOException;
+import java.util.List;
+
+import com.eco.environet.finance.dto.FixedExpensesDto;
+import com.eco.environet.finance.services.impl.FinancePDFGeneratorServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/accountant-generate-pdf")
+@RequiredArgsConstructor
+@Tag(name = "Accountant PDFs", description = "Manage Accountant's PDF generation")
+public class PDFGeneratorController {
+    private final FinancePDFGeneratorServiceImpl generatorService;
+
+    @Operation(summary = "Generate PDF report for Fixed Expenses")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Generated PDF report for Fixed Expenses", content = @Content(mediaType = "application/json")),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = "text/plain"))
+    })
+    @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
+    @PostMapping(value = "/generate", consumes = "application/json")
+    public ResponseEntity<Resource> createNewRevenue(
+            @RequestBody List<FixedExpensesDto> fixedExpensesDtos,
+            @RequestParam(name = "filename", required = false, defaultValue = "fixed_expenses.pdf") String filename,
+            @RequestParam(name = "columns", required = false) List<String> columns
+    ) {
+        try {
+            Resource result = generatorService.generateFixedExpensesListPDF(fixedExpensesDtos, "Fixed Expenses List", columns);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+}
