@@ -4,7 +4,7 @@ import com.eco.environet.finance.dto.ProjectBudgetDto;
 
 public interface ProjectBudgetService {
     ProjectBudgetDto create(ProjectBudgetDto newProjectBudget);
-    ProjectBudgetDto findById(Long id);
+    ProjectBudgetDto findByProjectId(Long id);
     //Page<ProjectBudgetDto> findAll(List<Long> projectIds, Pageable pageable);
     ProjectBudgetDto update(ProjectBudgetDto projectBudgetDto);
 }

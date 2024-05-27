@@ -33,9 +33,11 @@ public class ProjectBudgetServiceImpl implements ProjectBudgetService {
     }
 
     @Override
-    public ProjectBudgetDto findById(Long id) {
-        ProjectBudget projectBudget = repository.findById(id)
-                .orElseThrow(()-> new EntityNotFoundException("Project budget not found with ID: " + id));
+    public ProjectBudgetDto findByProjectId(Long id) {
+//        Project project = projectRepository.findById(id)
+//              .orElseThrow(()-> new EntityNotFoundException("Project not found with ID: " + id));
+        ProjectBudget projectBudget = repository.findByProjectId(id)
+                .orElseThrow(()-> new EntityNotFoundException("Project budget not found for project with ID: " + id));
         return Mapper.map(projectBudget, ProjectBudgetDto.class);
     }
 

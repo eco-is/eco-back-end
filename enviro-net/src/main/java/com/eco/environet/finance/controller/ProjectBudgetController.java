@@ -62,7 +62,7 @@ public class ProjectBudgetController {
     @GetMapping(value="/get/{id}")
     @PreAuthorize("hasAnyRole('BOARD_MEMBER', 'ACCOUNTANT')")
     public ResponseEntity<ProjectBudgetDto> getProjectBudget(@PathVariable Long id){
-        var result = service.findById(id);
+        var result = service.findByProjectId(id);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
