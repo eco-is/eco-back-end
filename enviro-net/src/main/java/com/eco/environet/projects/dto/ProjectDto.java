@@ -17,4 +17,9 @@ public class ProjectDto {
     private Type type;
     private Status status;
     private UserContactDto manager;
+
+    @Override
+    public String toString() {
+        return name + " - " + type + " (status: " + status + ")";
+    }
 }
