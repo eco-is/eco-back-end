@@ -29,9 +29,11 @@ public class FinancePDFGeneratorServiceImpl implements FinancePDFGeneratorServic
         document.add(paragraph);
     }
     private void addTextParagraph(Document document, String text) {
-        Paragraph paragraph = new Paragraph(text).setBold().setFontSize(16).setMarginTop(20);
-        paragraph.setTextAlignment(TextAlignment.LEFT);
-        document.add(paragraph);
+        if (text == null || !text.isEmpty()){
+            Paragraph paragraph = new Paragraph(text).setBold().setFontSize(16).setMarginTop(20);
+            paragraph.setTextAlignment(TextAlignment.LEFT);
+            document.add(paragraph);
+        }
     }
     private void addTable(Document document, List<?> list, List<String> columnsList, Map<String, String> columnMappings) {
         Table table = new Table(columnsList.size());
@@ -76,13 +78,14 @@ public class FinancePDFGeneratorServiceImpl implements FinancePDFGeneratorServic
             "employee", "Employee",
             "overtimeHours", "Overtime (h)"
             );
-    public Resource generateFixedExpensesListPDF(List<FixedExpensesDto> expenses, String documentTitle, List<String> columns) throws IOException {
+    public Resource generateFixedExpensesListPDF(List<FixedExpensesDto> expenses, String documentTitle, String text, List<String> columns) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (
             PdfWriter writer = new PdfWriter(outputStream);
             PdfDocument pdfDocument = new PdfDocument(writer);
             Document document = new Document(pdfDocument)) {
             addTitleText(document, documentTitle);
+            addTextParagraph(document, text);
             if (columns == null){
                 columns = List.of("number", "type", "creator", "description", "amount");
             }

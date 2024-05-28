@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface FinancePDFGeneratorService {
 
-    public Resource generateFixedExpensesListPDF(List<FixedExpensesDto> expenses, String documentTitle, List<String> columns) throws IOException;
+    public Resource generateFixedExpensesListPDF(List<FixedExpensesDto> expenses, String documentTitle, String text, List<String> columns) throws IOException;
 }
