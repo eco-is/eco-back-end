@@ -24,4 +24,9 @@ public class UserContactDto {
         this.username = user.getUsername();
         this.email = user.getEmail();
     }
+
+    @Override
+    public String toString() {
+        return name + " " + surname + " (" + username + ")";
+    }
 }

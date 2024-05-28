@@ -1,72 +1,26 @@
 package com.eco.environet.finance.services.impl;
 
 import com.eco.environet.finance.dto.FixedExpensesDto;
+import com.eco.environet.finance.dto.RevenueDto;
 import com.eco.environet.finance.services.FinancePDFGeneratorService;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.properties.TextAlignment;
-import java.io.ByteArrayOutputStream;
+import com.eco.environet.util.PDFGenerator;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-import com.itextpdf.layout.properties.UnitValue;
-import org.springframework.core.io.ByteArrayResource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+
+@Service
+@RequiredArgsConstructor
 public class FinancePDFGeneratorServiceImpl implements FinancePDFGeneratorService {
-    private void addTitleText(Document document, String titleText) {
-        Paragraph paragraph = new Paragraph(titleText).setBold().setFontSize(24).setMarginTop(20);
-        paragraph.setTextAlignment(TextAlignment.CENTER);
-        document.add(paragraph);
-    }
-    private void addTextParagraph(Document document, String text) {
-        if (text == null || !text.isEmpty()){
-            Paragraph paragraph = new Paragraph(text).setBold().setFontSize(16).setMarginTop(20);
-            paragraph.setTextAlignment(TextAlignment.LEFT);
-            document.add(paragraph);
-        }
-    }
-    private void addTable(Document document, List<?> list, List<String> columnsList, Map<String, String> columnMappings) {
-        Table table = new Table(columnsList.size());
+    @Value("${baseFrontUrl}")
+    private String baseFrontUrl;
 
-        // header row
-        for (String columnName : columnsList) {
-            table.addHeaderCell(new Cell().add(new Paragraph(columnMappings.getOrDefault(columnName, columnName))));
-        }
-
-        // content rows
-        int rowNum = 1;
-        for (Object obj : list) {
-            for (String columnName : columnsList) {
-                try {
-                    if (!columnName.equals("number")){
-                        Method method = obj.getClass().getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
-                        Object value = method.invoke(obj);
-                        table.addCell(value != null ? value.toString() : "");
-                    } else{
-                        table.addCell(String.valueOf(rowNum++));
-                    }
-                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace(); // Handle the exception appropriately
-                    table.addCell(""); // Add empty cell if method not found or inaccessible
-                }
-            }
-        }
-        table.setWidth(UnitValue.createPercentValue(100));
-
-        document.add(table);
-    }
-
-    private final Map<String, String> columnMappings = Map.of(
+    private final Map<String, String> fixedExpensesColumnMappings = Map.of(
             "number", "#",
             "id", "Id",
             "type", "Type",
@@ -76,21 +30,30 @@ public class FinancePDFGeneratorServiceImpl implements FinancePDFGeneratorServic
             "createdOn", "Created on date",
             "description", "Description",
             "employee", "Employee",
-            "overtimeHours", "Overtime (h)"
-            );
-    public Resource generateFixedExpensesListPDF(List<FixedExpensesDto> expenses, String documentTitle, String text, List<String> columns) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (
-            PdfWriter writer = new PdfWriter(outputStream);
-            PdfDocument pdfDocument = new PdfDocument(writer);
-            Document document = new Document(pdfDocument)) {
-            addTitleText(document, documentTitle);
-            addTextParagraph(document, text);
-            if (columns == null){
-                columns = List.of("number", "type", "creator", "description", "amount");
-            }
-            addTable(document, expenses, columns, columnMappings);
+            "overtimeHours", "Overtime hours"
+    );
+    @Override
+    public Resource generateFixedExpensesPDF(List<FixedExpensesDto> expenses, String documentTitle, String text, List<String> columns) throws IOException {
+        if (columns == null) {
+            columns = List.of("number", "type", "description", "amount");
         }
-        return new ByteArrayResource(outputStream.toByteArray());
+        return PDFGenerator.generatePDF(expenses, documentTitle, text, columns, fixedExpensesColumnMappings);
+    }
+
+    private final Map<String, String> revenuesColumnMappings = Map.of(
+            "number", "#",
+            "id", "Id",
+            "type", "Type",
+            "amount", "Amount",
+            "createdOn", "Created on date",
+            "donator", "Donator",
+            "project", "Project"
+    );
+    @Override
+    public Resource generateRevenuePDF(List<RevenueDto> revenues, String documentTitle, String text, List<String> columns) throws IOException {
+        if (columns == null) {
+            columns = List.of("number", "type", "createdOn", "amount");
+        }
+        return PDFGenerator.generatePDF(revenues, documentTitle, text, columns, revenuesColumnMappings);
     }
 }
