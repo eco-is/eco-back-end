@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -31,4 +33,7 @@ public class TestExecution {
 
     @Column(name = "finished", nullable = false)
     private Boolean finished;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "testExecution")
+    private Set<AnsweredQuestion> answers;
 }

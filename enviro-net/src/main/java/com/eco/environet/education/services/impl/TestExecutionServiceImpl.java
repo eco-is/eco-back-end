@@ -4,10 +4,8 @@ import com.eco.environet.education.dto.SubmittedAnswer;
 import com.eco.environet.education.dto.TestCompletionRequest;
 import com.eco.environet.education.dto.TestCompletionResponse;
 import com.eco.environet.education.dto.TestExecutionDto;
-import com.eco.environet.education.model.Answer;
-import com.eco.environet.education.model.Lecture;
-import com.eco.environet.education.model.QuestionType;
-import com.eco.environet.education.model.TestExecution;
+import com.eco.environet.education.model.*;
+import com.eco.environet.education.repository.AnsweredQuestionRepository;
 import com.eco.environet.education.repository.LectureRepository;
 import com.eco.environet.education.repository.QuestionRepository;
 import com.eco.environet.education.repository.TestExecutionRepository;
@@ -18,8 +16,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +29,7 @@ public class TestExecutionServiceImpl implements TestExecutionService {
     private final QuestionRepository questionRepository;
     private final LectureRepository lectureRepository;
     private final UserRepository userRepository;
+    private final AnsweredQuestionRepository answeredQuestionRepository;
     @Override
     public TestExecutionDto findByFinishedAndUserId(Boolean finished, Long userId) {
         return Mapper.map(testExecutionRepository
@@ -60,7 +59,7 @@ public class TestExecutionServiceImpl implements TestExecutionService {
         if (existingExecution.isPresent()) {
             return Mapper.map(existingExecution.get(), TestExecutionDto.class);
         }
-        return Mapper.map(testExecutionRepository.save(new TestExecution(user, lecture, 0, false)), TestExecutionDto.class);
+        return Mapper.map(testExecutionRepository.save(new TestExecution(user, lecture, 0, false, new HashSet<>())), TestExecutionDto.class);
     }
 
     @Override
@@ -73,7 +72,8 @@ public class TestExecutionServiceImpl implements TestExecutionService {
         var lecture = lectureRepository.findById(testCompletionRequest.getLectureId()).orElseThrow(() -> new EntityNotFoundException("Cannot find lecture with id: " + testCompletionRequest.getLectureId()));
         var user = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Cannot find user with username: " + username));
         var testExecution = testExecutionRepository.findByUser_IdAndLecture_Id(user.getId(), lecture.getId()).orElseThrow(() -> new IllegalArgumentException("User with id: " + user.getId() + "did not start test with lectureId: " + lecture.getId()));
-        double points = calculatePoints(testCompletionRequest.getAnswers(), lecture);
+        double points = calculatePoints(testCompletionRequest.getAnswers(), lecture, testExecution);
+
         if (!testExecution.getFinished()) {
             testExecution.setFinished(true);
             testExecution.setPoints(points);
@@ -82,10 +82,11 @@ public class TestExecutionServiceImpl implements TestExecutionService {
         return new TestCompletionResponse(lecture.getId(), user.getId(), points);
     }
 
-    private double calculatePoints(Set<SubmittedAnswer> answers, Lecture lecture) {
+    private double calculatePoints(Set<SubmittedAnswer> answers, Lecture lecture, TestExecution testExecution) {
         double points = 0;
         for (SubmittedAnswer answer : answers) {
             var question = questionRepository.findById(answer.getQuestionId()).orElseThrow(() -> new EntityNotFoundException("Cannot find question with id: " + answer.getQuestionId()));
+            saveAnswerSubmission(answer, question, testExecution);
             if (question.getType() == QuestionType.FILL_IN) {
                 var isFillInAnswerCorrect = question
                         .getAnswers()
@@ -107,5 +108,31 @@ public class TestExecutionServiceImpl implements TestExecutionService {
             }
         }
         return points;
+    }
+
+    private void saveAnswerSubmission(SubmittedAnswer answer, Question question, TestExecution testExecution) {
+        var answeredQuestions = new HashSet<AnsweredQuestion>();
+        answeredQuestions.add(
+                AnsweredQuestion.builder()
+                .question(question)
+                .answers(
+                        question
+                        .getAnswers().stream()
+                        .filter(
+                                a -> answer
+                                .getAnswerIds()
+                                .contains(a.getId())
+                        )
+                        .collect(Collectors.toSet())
+                )
+                .textAnswer(
+                        question.getType() == QuestionType.FILL_IN ?
+                                answer.getTextAnswer()
+                                : null
+                )
+                .testExecution(testExecution)
+                .build()
+        );
+        answeredQuestionRepository.saveAll(answeredQuestions);
     }
 }

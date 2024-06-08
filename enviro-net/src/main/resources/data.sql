@@ -238,4 +238,26 @@ VALUES
     (TRUE, 23, 2, 2),
     (TRUE, 11, 2, 3),
     (FALSE, 0, 2, 4),
-    (TRUE, 7, 3, 2);
+    (TRUE, 7, 3, 2),
+    (TRUE, 2, 5, 3),
+    (TRUE, 2, 5, 4);
+
+INSERT INTO education.answered_question (lecture_id, question_id, user_id, text_answer) VALUES
+    (5, 14, 3, null),
+    (5, 15, 3, 'Deforestation'),
+    (5, 13, 3, null);
+
+INSERT INTO education.submitted_answers (answer_id, submission_id) VALUES
+    (37, 1),
+    (38, 1),
+    (34, 3);
+
+INSERT INTO education.answered_question (lecture_id, question_id, user_id, text_answer) VALUES
+    (5, 14, 4, null),
+    (5, 15, 4, 'asd'),
+    (5, 13, 4, null);
+
+INSERT INTO education.submitted_answers (answer_id, submission_id) VALUES
+    (37, 4),
+    (38, 5),
+    (34, 6);
