@@ -1,7 +1,4 @@
 -- Finance
-INSERT INTO users.accountants (id, wage, working_hours, overtime_wage)
-VALUES (5, 18.7, 7, 20),
-       (6, 18.7, 7, 20);
 INSERT INTO users.organization_members (id, wage, working_hours, overtime_wage)
 VALUES
     (5, 18.7, 7, 20),
