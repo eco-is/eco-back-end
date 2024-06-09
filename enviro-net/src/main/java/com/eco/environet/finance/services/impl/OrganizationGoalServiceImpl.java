@@ -1,9 +1,9 @@
 package com.eco.environet.finance.services.impl;
 
-import com.eco.environet.finance.dto.AccountantDto;
 import com.eco.environet.finance.model.OrganizationGoalStatus;
 import com.eco.environet.finance.repository.OrganizationGoalSpecifications;
 import com.eco.environet.finance.services.OrganizationGoalService;
+import com.eco.environet.users.dto.UserContactDto;
 import com.eco.environet.users.model.User;
 import com.eco.environet.finance.dto.OrganizationGoalDto;
 import com.eco.environet.finance.dto.OrganizationGoalsSetDto;
@@ -132,7 +132,7 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
 
         Page<OrganizationGoal> currentGoals = repository.findByValidPeriodEndDateIsNull(Pageable.unpaged());
         for (OrganizationGoal goal: currentGoals){
-            AccountantDto creator = new AccountantDto(goal.getCreator().getId(),goal.getCreator().getUsername(),goal.getCreator().getName(),goal.getCreator().getSurname(),goal.getCreator().getEmail());
+            UserContactDto creator = new UserContactDto(goal.getCreator().getId(),goal.getCreator().getUsername(),goal.getCreator().getName(),goal.getCreator().getSurname(),goal.getCreator().getEmail());
             validGoalsList.add(new OrganizationGoalDto(goal.getId(), goal.getTitle(), goal.getDescription(), goal.getRationale(), goal.getPriority(), goal.getStatus().toString(), goal.getValidPeriod(), creator));
             goalSet.setValidPeriod(goal.getValidPeriod());
         }
@@ -198,7 +198,7 @@ public class OrganizationGoalServiceImpl implements OrganizationGoalService {
                 updateGoal.setValidPeriod(period);
                 updateGoal.setStatus(OrganizationGoalStatus.VALID);
                 repository.save(updateGoal);
-                AccountantDto creator = new AccountantDto(updateGoal.getCreator().getId(),updateGoal.getCreator().getUsername(),updateGoal.getCreator().getName(),updateGoal.getCreator().getSurname(),updateGoal.getCreator().getEmail());
+                UserContactDto creator = new UserContactDto(updateGoal.getCreator().getId(),updateGoal.getCreator().getUsername(),updateGoal.getCreator().getName(),updateGoal.getCreator().getSurname(),updateGoal.getCreator().getEmail());
                 newValidGoalsList.add(new OrganizationGoalDto(updateGoal.getId(), updateGoal.getTitle(), updateGoal.getDescription(), updateGoal.getRationale(), updateGoal.getPriority(), updateGoal.getStatus().toString(), updateGoal.getValidPeriod(), creator));
             }
         }

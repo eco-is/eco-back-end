@@ -1,6 +1,7 @@
 package com.eco.environet.finance.dto;
 
 import com.eco.environet.finance.model.DateRange;
+import com.eco.environet.users.dto.UserContactDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,5 @@ public class OrganizationGoalDto {
     private int priority;
     private String status;
     private DateRange validPeriod;
-    private AccountantDto creator;
+    private UserContactDto creator;
 }
