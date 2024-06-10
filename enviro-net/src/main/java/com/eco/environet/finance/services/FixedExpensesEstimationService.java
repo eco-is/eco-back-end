@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface FixedExpensesEstimationService {
-    List<FixedExpensesEstimationDto> generateEstimationForBudgetPlan(Long id);
+    List<FixedExpensesEstimationDto> getEstimationsForBudgetPlan(Long id);
     FixedExpensesEstimationDto create(FixedExpensesEstimationDto fixedExpensesEstimationDto);
     Page<FixedExpensesEstimationDto> findAll(Long budgetPlanId, List<String> types, List<Long> employees, Pageable pageable);
     FixedExpensesEstimationDto findById(Long id);

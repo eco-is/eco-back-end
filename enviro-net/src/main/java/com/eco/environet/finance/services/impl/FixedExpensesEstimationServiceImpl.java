@@ -61,24 +61,10 @@ public class FixedExpensesEstimationServiceImpl implements FixedExpensesEstimati
     }
 
     @Override
-    public List<FixedExpensesEstimationDto> generateEstimationForBudgetPlan(Long id){
+    public List<FixedExpensesEstimationDto> getEstimationsForBudgetPlan(Long id){
         BudgetPlan budgetPlan = budgetPlanRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Budget Plan not found with ID: " + id));
         List<FixedExpensesEstimation> existing = repository.findByBudgetPlanId(id);
-        if (!existing.isEmpty()){
-            existing.forEach(this::setEstimation);
-            return Mapper.mapList(existing, FixedExpensesEstimationDto.class);
-        }
-
-        OrganizationMember creator = new OrganizationMember();
-        creator.setId(budgetPlan.getAuthor().getId());
-        List<OrganizationMember> employees = organizationMemberRepository.findAllActiveOrganizationMembers();
-        for (OrganizationMember employee : employees){
-            Salary newSalary = createSalaryForEmployee(budgetPlan.getFiscalDateRange(), creator, employee);
-            FixedExpensesEstimation newEstimation = new FixedExpensesEstimation(budgetPlan, newSalary);
-            existing.add(newEstimation);
-            repository.save(newEstimation);
-        }
         existing.forEach(this::setEstimation);
         return Mapper.mapList(existing, FixedExpensesEstimationDto.class);
     }

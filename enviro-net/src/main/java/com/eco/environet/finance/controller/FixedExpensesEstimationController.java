@@ -26,7 +26,7 @@ import java.util.List;
 public class FixedExpensesEstimationController {
     private final FixedExpensesEstimationService service;
 
-    @Operation(summary = "Generate Fixed Expenses Estimations for BudgetPlan or display if already exists")
+    @Operation(summary = "Get Fixed Expenses Estimations for BudgetPlan")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fixed Expenses Estimations fetched!",
                     content = { @Content(mediaType = "application/json",
@@ -42,12 +42,12 @@ public class FixedExpensesEstimationController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = @Content)
     })
-    @GetMapping(value = "/generate")
+    @GetMapping(value = "/get")
     @PreAuthorize("hasRole('ACCOUNTANT')")
-    public ResponseEntity<List<FixedExpensesEstimationDto>> generate(
+    public ResponseEntity<List<FixedExpensesEstimationDto>> getByBudgetPlanId(
             @RequestParam(name = "budgetPlanId", required = true) Long budgetPlanId
     ) {
-        var result = service.generateEstimationForBudgetPlan(budgetPlanId);
+        var result = service.getEstimationsForBudgetPlan(budgetPlanId);
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
 
