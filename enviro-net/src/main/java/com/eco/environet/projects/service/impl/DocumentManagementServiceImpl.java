@@ -13,11 +13,10 @@ import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
 import com.eco.environet.util.JsonUtil;
 import com.eco.environet.util.Mapper;
+import com.eco.environet.util.PdfService;
 import com.eco.environet.util.kafka.producer.SagaProducer;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -54,7 +53,7 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     private static final String TRANSACTIONAL_ID_PATTERN = "%s_%s";
     private final JsonUtil jsonUtil;
     private final SagaProducer sagaProducer;
-    private final EventService eventService;
+    private final PdfService pdfService;
 
     public DocumentDto createDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
         if (projectId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
@@ -86,30 +85,23 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         User author = userRepository.findById(documentDto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-//        if (!assignmentRepository.isWriter(documentId, projectId, documentDto.getUserId())) {
-//            throw new IllegalArgumentException("Uploader isn't assigned to document");
-//        }
+        if (!assignmentRepository.isWriter(documentId, projectId, documentDto.getUserId())) {
+            throw new IllegalArgumentException("Uploader isn't assigned to document");
+        }
 
-//        if (documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
-//            updateProgress(documentDto, document);
-//        }
+        if (documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
+            updateProgress(documentDto, document);
+        }
 
-//        Path filePath = saveFile(document.getName(), documentDto.getFile(), project.getName(), versionRepository.getNextVersion(projectId, documentId));
-//        createDocumentVersion(filePath, document, author);
-
-        // projectId, documentId parametri
-        // document.name = name
-        // versionRepository.getNextVersion(projectId, documentId) = version
-        // text = documentDto.file
+        Path filePath = saveFile(document.getName(), documentDto.getFile(), project.getName(), versionRepository.getNextVersion(projectId, documentId));
+        createDocumentVersion(filePath, document, author);
 
         var documentPayload = DocumentPayload.builder()
                 .documentId(documentId)
                 .projectId(projectId)
                 .name(document.getName())
-//                .version(versionRepository.getNextVersion(projectId, documentId))
-//                .text(new String(documentDto.getFile().getBytes()))
-                .version(1L)
-                .text("text")
+                .version(versionRepository.getNextVersion(projectId, documentId))
+                .text(pdfService.extractTextFromPdf(documentDto.getFile()))
                 .build();
 
         sagaProducer.sendEvent(jsonUtil.toJson(this.createPayload(documentPayload)));
