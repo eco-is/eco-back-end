@@ -11,9 +11,13 @@ import com.eco.environet.projects.repository.ProjectRepository;
 import com.eco.environet.projects.service.DocumentManagementService;
 import com.eco.environet.users.model.User;
 import com.eco.environet.users.repository.UserRepository;
+import com.eco.environet.util.JsonUtil;
 import com.eco.environet.util.Mapper;
+import com.eco.environet.util.kafka.producer.SagaProducer;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -28,9 +32,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static java.lang.String.format;
 
 @RequiredArgsConstructor
 @Transactional
@@ -44,6 +50,11 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
     private final DocumentVersionRepository versionRepository;
     private final AssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
+
+    private static final String TRANSACTIONAL_ID_PATTERN = "%s_%s";
+    private final JsonUtil jsonUtil;
+    private final SagaProducer sagaProducer;
+    private final EventService eventService;
 
     public DocumentDto createDocument(Long projectId, DocumentCreationDto documentDto) throws IOException {
         if (projectId == null || documentDto == null || documentDto.getFile() == null || documentDto.getFile().isEmpty()) {
@@ -75,18 +86,49 @@ public class DocumentManagementServiceImpl implements DocumentManagementService 
         User author = userRepository.findById(documentDto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        if (!assignmentRepository.isWriter(documentId, projectId, documentDto.getUserId())) {
-            throw new IllegalArgumentException("Uploader isn't assigned to document");
-        }
+//        if (!assignmentRepository.isWriter(documentId, projectId, documentDto.getUserId())) {
+//            throw new IllegalArgumentException("Uploader isn't assigned to document");
+//        }
 
-        if (documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
-            updateProgress(documentDto, document);
-        }
+//        if (documentDto.getProgress() != null && documentDto.getProgress() != 0.0) {
+//            updateProgress(documentDto, document);
+//        }
 
-        Path filePath = saveFile(document.getName(), documentDto.getFile(), project.getName(), versionRepository.getNextVersion(projectId, documentId));
-        createDocumentVersion(filePath, document, author);
+//        Path filePath = saveFile(document.getName(), documentDto.getFile(), project.getName(), versionRepository.getNextVersion(projectId, documentId));
+//        createDocumentVersion(filePath, document, author);
+
+        // projectId, documentId parametri
+        // document.name = name
+        // versionRepository.getNextVersion(projectId, documentId) = version
+        // text = documentDto.file
+
+        var documentPayload = DocumentPayload.builder()
+                .documentId(documentId)
+                .projectId(projectId)
+                .name(document.getName())
+//                .version(versionRepository.getNextVersion(projectId, documentId))
+//                .text(new String(documentDto.getFile().getBytes()))
+                .version(1L)
+                .text("text")
+                .build();
+
+        sagaProducer.sendEvent(jsonUtil.toJson(this.createPayload(documentPayload)));
 
         return Mapper.map(document, DocumentDto.class);
+    }
+
+    private Event createPayload(DocumentPayload documentPayload) {
+        return Event.builder()
+                .payload(documentPayload)
+                .createdAt(LocalDateTime.now())
+                .documentId(documentPayload.getDocumentId())
+                .transactionId(this.generateTransactionId())
+                .eventHistory(new ArrayList<>())
+                .build();
+    }
+
+    private String generateTransactionId() {
+        return format(TRANSACTIONAL_ID_PATTERN, Instant.now().toEpochMilli(), UUID.randomUUID());
     }
 
     @Override
